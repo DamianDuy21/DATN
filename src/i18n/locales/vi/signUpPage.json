@@ -1,0 +1,60 @@
+{
+  "leftSide": {
+    "hero": {
+      "title": "Tạo tài khoản",
+      "subtitle": "Tham gia Chatify và bắt đầu hành trình học ngôn ngữ của bạn!"
+    },
+    "form": {
+      "fullName": {
+        "label": "Họ và tên",
+        "placeholder": "Nhập họ và tên của bạn"
+      },
+      "email": {
+        "label": "Email",
+        "placeholder": "email@example.com"
+      },
+      "password": {
+        "label": "Mật khẩu",
+        "placeholder": "********"
+      },
+      "termsAndPolicy": {
+        "label": "Tôi đồng ý với",
+        "terms": "điều khoản dịch vụ",
+        "and": "và",
+        "privacyPolicy": "chính sách bảo mật"
+      },
+
+      "signUpButton": {
+        "text": "Đăng ký",
+        "loadingText": "Đang đăng ký..."
+      }
+    },
+    "prompt": {
+      "alreadyHaveAccount": {
+        "text": "Đã có tài khoản?",
+        "linkText": "Đăng nhập"
+      }
+    }
+  },
+  "rightSide": {
+    "title": "Kết nối bạn bè trên toàn thế giới",
+    "subtitle": "Trò chuyện, kết bạn và nâng cao kỹ năng ngoại ngữ"
+  },
+  "verificationStep": {
+    "title": "Xác thực tài khoản",
+    "subtitle": "Nhập mã xác thực đã gửi đến email của bạn",
+    "form": {
+      "verificationCode": {
+        "label": "Mã xác thực",
+        "placeholder": "Nhập mã xác thực"
+      },
+      "resendCode": {
+        "text": "Gửi lại"
+      },
+      "verifyButton": {
+        "text": "Xác thực",
+        "loadingText": "Đang xác thực..."
+      }
+    }
+  }
+}

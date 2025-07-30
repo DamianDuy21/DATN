@@ -1,0 +1,44 @@
+{
+  "leftSide": {
+    "hero": {
+      "title": "Welcome back",
+      "subtitle": "Sign in to continue your language journey"
+    },
+    "form": {
+      "email": {
+        "label": "Email",
+        "placeholder": "email@example.com"
+      },
+      "password": {
+        "label": "Password",
+        "placeholder": "********"
+      },
+      "termsAndPolicy": {
+        "label": "I agree to the",
+        "terms": "terms of service",
+        "and": "and",
+        "privacyPolicy": "privacy policy"
+      },
+
+      "signInButton": {
+        "text": "Sign in",
+        "loadingText": "Signing in..."
+      }
+    },
+    "prompt": {
+      "noAccount": {
+        "text": "Don't have an account?",
+        "linkText": "Sign up"
+      },
+      "or": "or",
+      "forgotPassword": {
+        "text": "Forgot your password?",
+        "linkText": "Reset it"
+      }
+    }
+  },
+  "rightSide": {
+    "title": "Connect with friends around the world",
+    "subtitle": "Chat, make friends, and improve your language skills together"
+  }
+}

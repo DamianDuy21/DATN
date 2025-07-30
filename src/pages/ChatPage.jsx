@@ -1,21 +1,21 @@
+import { useQuery } from "@tanstack/react-query";
 import { useEffect, useState } from "react";
 import { useParams } from "react-router";
-import { useAuthUser } from "../hooks/useAuthUser.js";
-import { useQuery } from "@tanstack/react-query";
-import { getStreamToken } from "../lib/api.js";
 import {
-  Chat,
   Channel,
   ChannelHeader,
+  Chat,
   MessageInput,
   MessageList,
   Thread,
   Window,
 } from "stream-chat-react";
+import { useAuthUser } from "../hooks/useAuthUser.js";
+import { getStreamTokenAPI } from "../lib/api.js";
 
 import { StreamChat } from "stream-chat";
-import ChatPageLoader from "../components/ChatPageLoader.jsx";
 import CallVideoButton from "../components/CallVideoButton.jsx";
+import ChatPageLoader from "../components/ChatPageLoader.jsx";
 
 const ChatPage = () => {
   const { id: receivedUserId } = useParams();
@@ -28,7 +28,7 @@ const ChatPage = () => {
 
   const { data: streamTokenData } = useQuery({
     queryKey: ["getStreamToken"],
-    queryFn: getStreamToken,
+    queryFn: getStreamTokenAPI,
     // run only if user is authenticated (after getMe is triggered)
     enabled: Boolean(authUser),
   });

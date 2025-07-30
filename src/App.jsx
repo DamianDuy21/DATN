@@ -9,18 +9,20 @@ import ChatPage from "./pages/ChatPage";
 import ForgotPasswordPage from "./pages/ForgotPasswordPage.jsx";
 import FriendsPage from "./pages/FriendsPage.jsx";
 import HomePage from "./pages/HomePage";
-import LoginPage from "./pages/LoginPage";
+
 import NotificationsPage from "./pages/NotificationsPage";
 import OnboardingPage from "./pages/OnboardingPage";
 import ProfilePage from "./pages/ProfilePage.jsx";
 import SignUpPage from "./pages/SignUpPage";
 import { useThemeStore } from "./stores/useThemeStore.js";
+import LoginPage from "./pages/LoginPage.jsx";
 
 const App = () => {
   const { isLoading, authUser } = useAuthUser();
   const { theme } = useThemeStore();
 
   const isAuthenticated = Boolean(authUser);
+
   const isOnboarding = authUser?.isOnboarded;
 
   if (isLoading) {
@@ -39,7 +41,7 @@ const App = () => {
                   <HomePage />
                 </MainLayout>
               ) : (
-                <Navigate to={!isAuthenticated ? "/login" : "/onboarding"} />
+                <Navigate to={!isAuthenticated ? "/signin" : "/onboarding"} />
               )
             }
           />
@@ -51,7 +53,7 @@ const App = () => {
                   <ChatPage />
                 </MainLayout>
               ) : (
-                <Navigate to={!isAuthenticated ? "/login" : "/onboarding"} />
+                <Navigate to={!isAuthenticated ? "/signin" : "/onboarding"} />
               )
             }
           />
@@ -61,7 +63,7 @@ const App = () => {
               isAuthenticated && isOnboarding ? (
                 <CallVideoPage />
               ) : (
-                <Navigate to={!isAuthenticated ? "/login" : "/onboarding"} />
+                <Navigate to={!isAuthenticated ? "/signin" : "/onboarding"} />
               )
             }
           />
@@ -73,7 +75,7 @@ const App = () => {
                   <NotificationsPage />
                 </MainLayout>
               ) : (
-                <Navigate to={!isAuthenticated ? "/login" : "/onboarding"} />
+                <Navigate to={!isAuthenticated ? "/signin" : "/onboarding"} />
               )
             }
           />
@@ -85,7 +87,7 @@ const App = () => {
                   <FriendsPage />
                 </MainLayout>
               ) : (
-                <Navigate to={!isAuthenticated ? "/login" : "/onboarding"} />
+                <Navigate to={!isAuthenticated ? "/signin" : "/onboarding"} />
               )
             }
           />
@@ -97,7 +99,7 @@ const App = () => {
                   <ProfilePage />
                 </MainLayout>
               ) : (
-                <Navigate to={!isAuthenticated ? "/login" : "/onboarding"} />
+                <Navigate to={!isAuthenticated ? "/signin" : "/onboarding"} />
               )
             }
           />
@@ -109,7 +111,7 @@ const App = () => {
                   <ChangePasswordPage />
                 </MainLayout>
               ) : (
-                <Navigate to={!isAuthenticated ? "/login" : "/onboarding"} />
+                <Navigate to={!isAuthenticated ? "/signin" : "/onboarding"} />
               )
             }
           />
@@ -124,7 +126,7 @@ const App = () => {
                   <Navigate to={"/"} />
                 )
               ) : (
-                <Navigate to={"/login"} />
+                <Navigate to={"/signin"} />
               )
             }
           />
@@ -139,7 +141,7 @@ const App = () => {
             }
           />
           <Route
-            path="/login"
+            path="/signin"
             element={
               !isAuthenticated ? (
                 <LoginPage />
@@ -160,7 +162,18 @@ const App = () => {
           />
         </Routes>
 
-        <Toaster position="top-right" />
+        <Toaster
+          position="top-right"
+          toastOptions={{
+            duration: 3000,
+            style: {
+              fontSize: "14px",
+              minHeight: "48px",
+              padding: "8px 16px",
+            },
+          }}
+          gutter={8}
+        />
       </div>
     </>
   );

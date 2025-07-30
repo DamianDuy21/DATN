@@ -1,0 +1,44 @@
+{
+  "leftSide": {
+    "hero": {
+      "title": "Chào mừng trở lại",
+      "subtitle": "Đăng nhập để tiếp tục hành trình học ngôn ngữ của bạn"
+    },
+    "form": {
+      "email": {
+        "label": "Email",
+        "placeholder": "email@example.com"
+      },
+      "password": {
+        "label": "Mật khẩu",
+        "placeholder": "********"
+      },
+      "termsAndPolicy": {
+        "label": "Tôi đồng ý với",
+        "terms": "điều khoản dịch vụ",
+        "and": "và",
+        "privacyPolicy": "chính sách bảo mật"
+      },
+
+      "signInButton": {
+        "text": "Đăng nhập",
+        "loadingText": "Đang đăng nhập..."
+      }
+    },
+    "prompt": {
+      "noAccount": {
+        "text": "Chưa có tài khoản?",
+        "linkText": "Đăng ký ngay"
+      },
+      "or": "hoặc",
+      "forgotPassword": {
+        "text": "Quên mật khẩu?",
+        "linkText": "Khôi phục"
+      }
+    }
+  },
+  "rightSide": {
+    "title": "Kết nối bạn bè trên toàn thế giới",
+    "subtitle": "Trò chuyện, kết bạn và nâng cao kỹ năng ngoại ngữ"
+  }
+}

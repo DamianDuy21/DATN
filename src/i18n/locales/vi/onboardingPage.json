@@ -1,0 +1,32 @@
+{
+  "hero": {
+    "title": "Hoàn thiện hồ sơ",
+    "genAvatarButton": "Tạo hình đại diện ngẫu nhiên"
+  },
+  "form": {
+    "fullName": {
+      "label": "Họ và tên",
+      "placeholder": "Nhập họ và tên của bạn"
+    },
+    "bio": {
+      "label": "Giới thiệu",
+      "placeholder": "Giới thiệu bản thân và mục tiêu học ngoại ngữ của bạn"
+    },
+    "location": {
+      "label": "Vị trí",
+      "placeholder": "Thành phố, bang hoặc khu vực bạn đang sống"
+    },
+    "nativeLanguage": {
+      "label": "Ngôn ngữ mẹ đẻ",
+      "placeholder": "Chọn ngôn ngữ mẹ đẻ"
+    },
+    "learningLanguage": {
+      "label": "Ngôn ngữ bạn muốn học",
+      "placeholder": "Chọn ngôn ngữ bạn muốn học"
+    },
+    "button": {
+      "text": "Lưu và tiếp tục",
+      "loadingText": "Đang lưu..."
+    }
+  }
+}

@@ -1,80 +1,120 @@
+import { useMutation } from "@tanstack/react-query";
 import { ArrowLeft, LoaderIcon } from "lucide-react";
 import { useState } from "react";
 import { Link, useNavigate } from "react-router";
-import { showToast } from "../components/CostumedToast";
-import { axiosInstance } from "../lib/axiosInstance";
+
+import { resetPasswordAPI, resetPasswordVerificationAPI } from "../lib/api";
+import { showToast } from "../components/CostumedToast.jsx";
+import LocaleSwitcher from "../components/LocaleSwitcher.jsx";
+import { useTranslation } from "react-i18next";
 
 const ForgotPasswordPage = () => {
+  const { t } = useTranslation("forgotPasswordPage");
   const navigate = useNavigate();
-
   const [step, setStep] = useState(1);
   const [email, setEmail] = useState("");
-  const [resetCode, setResetCode] = useState("");
+  const [verificationCode, setVerificationCode] = useState("");
   const [newPassword, setNewPassword] = useState("");
 
-  const handleCheckValidEmail = async (e) => {
+  const { mutateAsync: resetPasswordMutation, isPending: isResettingPassword } =
+    useMutation({
+      mutationFn: resetPasswordAPI,
+      onSuccess: (data) => {
+        showToast({
+          message:
+            data?.message ||
+            "Please check your email for the verification code",
+          type: "success",
+        });
+        setStep(2);
+      },
+      onError: (error) => {
+        showToast({
+          message:
+            error?.response?.data?.message ||
+            "Failed to send verification code",
+          type: "error",
+        });
+      },
+    });
+
+  const {
+    mutateAsync: resetPasswordVerificationMutation,
+    isPending: isResetPasswordVerifying,
+  } = useMutation({
+    mutationFn: resetPasswordVerificationAPI,
+    onSuccess: (data) => {
+      showToast({
+        message: data?.message || "Password reset successful!",
+        type: "success",
+      });
+      navigate("/signin");
+    },
+    onError: (error) => {
+      showToast({
+        message: error?.response?.data?.message || "Failed to reset password",
+        type: "error",
+      });
+    },
+  });
+
+  const handleResetPassword = async (e) => {
     e.preventDefault();
-    if (!email) {
+    const trimmedEmail = email.trim();
+    if (!trimmedEmail) {
       showToast({
         message: "Email is required",
         type: "error",
       });
       return;
-    } else if (!/\S+@\S+\.\S+/.test(email)) {
+    } else if (!/\S+@\S+\.\S+/.test(trimmedEmail)) {
       showToast({
         message: "Invalid email format",
         type: "error",
       });
       return;
     }
-
     try {
-      const response = await axiosInstance.post("/auth/reset-password", {
-        email,
-      });
-      showToast({
-        message: "Reset code sent to your email",
-        type: "success",
-      });
-      setStep(2);
+      resetPasswordMutation(trimmedEmail);
     } catch (error) {
       console.error(error);
       showToast({
-        message: error?.message || "Failed to send reset code",
+        message: error?.message || "Failed to send verification code",
         type: "error",
       });
     }
   };
 
-  const handleResetPassword = async (e) => {
+  const handleResetPasswordVerification = async (e) => {
     e.preventDefault();
-    try {
-      if (!newPassword || !resetCode) {
-        showToast({
-          message: "New password and reset code are required",
-          type: "error",
-        });
-        return;
-      }
-      const passwordIsValid =
-        newPassword.length >= 8 &&
-        /[A-Z]/.test(newPassword) &&
-        /[a-z]/.test(newPassword) &&
-        /[0-9]/.test(newPassword) &&
-        /[!@#$%^&*(),.?":{}|<>]/.test(newPassword);
-      if (!passwordIsValid) {
-        showToast({
-          message:
-            "Password must be at least 8 characters long and include uppercase, lowercase, number, and special character",
-          type: "error",
-        });
-        return;
-      }
+    const trimmedNewPassword = newPassword.trim();
+    const trimmedVerificationCode = verificationCode.trim();
+    if (!trimmedNewPassword || !trimmedVerificationCode) {
       showToast({
-        message: "Password reset successful",
-        type: "success",
+        message: "New password and verification code are required",
+        type: "error",
       });
-      navigate("/login");
+      return;
+    }
+    const passwordIsValid =
+      trimmedNewPassword.length >= 8 &&
+      /[A-Z]/.test(trimmedNewPassword) &&
+      /[a-z]/.test(trimmedNewPassword) &&
+      /[0-9]/.test(trimmedNewPassword) &&
+      /[!@#$%^&*(),.?":{}|<>]/.test(trimmedNewPassword);
+    if (!passwordIsValid) {
+      showToast({
+        message:
+          "Password must be at least 8 characters long and include uppercase, lowercase, number, and special character",
+        type: "error",
+      });
+      return;
+    }
+    try {
+      resetPasswordVerificationMutation({
+        newPassword: trimmedNewPassword,
+        otp: trimmedVerificationCode,
+      });
     } catch (error) {
       console.error(error);
       showToast({
@@ -90,126 +130,158 @@ const ForgotPasswordPage = () => {
         className="flex items-center justify-center h-screen p-4 sm:p-6 md:p-8"
         data-theme="night"
       >
-        <div className="border border-primary/25 flex flex-col lg:flex-row w-full max-w-xl mx-auto bg-base-200 rounded-xl shadow-lg overflow-hidden">
+        <div className="border border-primary/25 flex flex-col lg:flex-row w-full max-w-xl mx-auto bg-base-200 rounded-xl shadow-lg">
           <div className="w-full p-8 flex flex-col">
             {step === 1 ? (
-              <form onSubmit={(e) => handleCheckValidEmail(e)} action="">
-                <div className="space-y-4">
-                  <div>
-                    <h2 className="text-xl font-semibold">Forgot Password</h2>
-                    <p className="text-sm opacity-70">
-                      Enter your email to get the reset code
-                    </p>
-                  </div>
-                  <div className="space-y-3">
-                    {/* EMAIL */}
-                    <div className="form-control w-full">
-                      <label className="label">
-                        <span className="label-text">Email</span>
-                      </label>
-                      <input
-                        type="text"
-                        placeholder="damianduy@example.com"
-                        className="input input-bordered w-full"
-                        value={email}
-                        onChange={(e) => setEmail(e.target.value)}
-                      />
-                    </div>
-                  </div>
-
-                  {/* SIGNUP BUTTON */}
-                  <button
-                    className="btn btn-primary w-full !mt-6"
-                    type="submit"
-                  >
-                    {true ? (
-                      "Send code"
-                    ) : (
-                      <>
-                        <LoaderIcon className="animate-spin size-5" />
-                        Loading...
-                      </>
-                    )}
-                  </button>
-
-                  {/* REDIRECT LOGIN */}
-                  <div className="text-center !mt-6">
-                    <p className="text-sm">
-                      <Link
-                        to="/login"
-                        className="text-primary hover:underline"
-                      >
-                        Back to Sign in
-                      </Link>
-                    </p>
-                  </div>
-                </div>
-              </form>
-            ) : (
-              <form onSubmit={(e) => handleResetPassword(e)} action="">
-                <div className="space-y-4">
-                  <div className="flex items-center gap-4">
-                    <ArrowLeft
-                      className="text-primary size-6 cursor-pointer"
-                      onClick={() => setStep(1)}
-                    />
+              <>
+                <form onSubmit={(e) => handleResetPassword(e)} action="">
+                  <div className="space-y-4">
                     <div>
-                      <h2 className="text-xl font-semibold">Forgot Password</h2>
+                      <h2 className="text-xl font-semibold">
+                        {t("emailStep.title")}
+                      </h2>
                       <p className="text-sm opacity-70">
-                        Enter the reset code and your new password
+                        {t("emailStep.subtitle")}
+                      </p>
+                    </div>
+                    <div className="space-y-3">
+                      {/* EMAIL */}
+                      <div className="form-control w-full">
+                        <label className="label">
+                          <span className="label-text">
+                            {t("emailStep.form.email.label")}
+                          </span>
+                        </label>
+                        <input
+                          type="text"
+                          placeholder={t("emailStep.form.email.placeholder")}
+                          className="input input-bordered w-full text-sm"
+                          value={email}
+                          onChange={(e) => setEmail(e.target.value)}
+                        />
+                      </div>
+                    </div>
+
+                    {/* SIGNUP BUTTON */}
+                    <button
+                      className="btn btn-primary w-full !mt-6"
+                      type="submit"
+                      disabled={isResettingPassword}
+                    >
+                      {!isResettingPassword ? (
+                        t("emailStep.form.sendButton.text")
+                      ) : (
+                        <>
+                          <LoaderIcon className="animate-spin size-5" />
+                          {t("emailStep.form.sendButton.loadingText")}
+                        </>
+                      )}
+                    </button>
+
+                    {/* REDIRECT SIGNIN */}
+                    <div className="text-center !mt-6">
+                      <p className="text-sm">
+                        <Link
+                          to="/signin"
+                          className="text-primary hover:underline"
+                        >
+                          {t("emailStep.form.backButton.text")}
+                        </Link>
                       </p>
                     </div>
                   </div>
-                  <div className="space-y-3">
-                    {/* NEW PASSWORD */}
-                    <div className="form-control w-full">
-                      <label className="label">
-                        <span className="label-text">New Password</span>
-                      </label>
-                      <input
-                        type="password"
-                        placeholder="Enter your new password"
-                        className="input input-bordered w-full"
-                        value={newPassword}
-                        onChange={(e) => setNewPassword(e.target.value)}
+                </form>
+                <div className="flex items-center justify-center mt-6">
+                  <LocaleSwitcher />
+                </div>
+              </>
+            ) : (
+              <>
+                <form
+                  onSubmit={(e) => handleResetPasswordVerification(e)}
+                  action=""
+                >
+                  <div className="space-y-4">
+                    <div className="flex items-center gap-4">
+                      <ArrowLeft
+                        className="text-primary size-6 cursor-pointer"
+                        onClick={() => setStep(1)}
                       />
-                      {/* <p className="text-xs opacity-70 mt-1">
+                      <div>
+                        <h2 className="text-xl font-semibold">
+                          {t("verificationStep.title")}
+                        </h2>
+                        <p className="text-sm opacity-70">
+                          {t("verificationStep.subtitle")}
+                        </p>
+                      </div>
+                    </div>
+                    <div className="space-y-3">
+                      {/* NEW PASSWORD */}
+                      <div className="form-control w-full">
+                        <label className="label">
+                          <span className="label-text">
+                            {t("verificationStep.form.newPassword.label")}
+                          </span>
+                        </label>
+                        <input
+                          type="password"
+                          placeholder={t(
+                            "verificationStep.form.newPassword.placeholder"
+                          )}
+                          className="input input-bordered w-full text-sm"
+                          value={newPassword}
+                          onChange={(e) => setNewPassword(e.target.value)}
+                        />
+                        {/* <p className="text-xs opacity-70 mt-1">
                         Password must be at least 6 characters long.
                       </p> */}
+                      </div>
+                      {/* REST CODE */}
+                      <div className="form-control w-full">
+                        <label className="label">
+                          <span className="label-text">
+                            {t("verificationStep.form.verificationCode.label")}
+                          </span>
+                        </label>
+                        <input
+                          type="text"
+                          placeholder={t(
+                            "verificationStep.form.verificationCode.placeholder"
+                          )}
+                          className="input input-bordered w-full text-sm"
+                          value={verificationCode}
+                          onChange={(e) => setVerificationCode(e.target.value)}
+                        />
+                        <p
+                          className="text-sm text-primary hover:underline mt-2 text-end cursor-pointer"
+                          onClick={handleResetPassword}
+                        >
+                          {t("verificationStep.form.resendCode.text")}
+                        </p>
+                      </div>
                     </div>
-                    {/* REST CODE */}
-                    <div className="form-control w-full">
-                      <label className="label">
-                        <span className="label-text">Reset Code</span>
-                      </label>
-                      <input
-                        type="text"
-                        placeholder="Enter your reset code"
-                        className="input input-bordered w-full"
-                        value={resetCode}
-                        onChange={(e) => setResetCode(e.target.value)}
-                      />
-                      <p className="text-sm text-primary hover:underline mt-2 text-end cursor-pointer">
-                        Resend
-                      </p>
-                    </div>
-                  </div>
 
-                  <button
-                    className="btn btn-primary w-full !mt-6"
-                    type="submit"
-                  >
-                    {true ? (
-                      "Confirm"
-                    ) : (
-                      <>
-                        <LoaderIcon className="animate-spin size-5" />
-                        Loading...
-                      </>
-                    )}
-                  </button>
+                    <button
+                      className="btn btn-primary w-full !mt-6"
+                      type="submit"
+                      disabled={isResetPasswordVerifying}
+                    >
+                      {!isResetPasswordVerifying ? (
+                        t("verificationStep.form.verifyButton.text")
+                      ) : (
+                        <>
+                          <LoaderIcon className="animate-spin size-5" />
+                          {t("verificationStep.form.verifyButton.loadingText")}
+                        </>
+                      )}
+                    </button>
+                  </div>
+                </form>
+                <div className="flex items-center justify-center mt-6">
+                  <LocaleSwitcher />
                 </div>
-              </form>
+              </>
             )}
           </div>
         </div>

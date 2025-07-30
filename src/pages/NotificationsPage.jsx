@@ -9,27 +9,28 @@ import {
   X,
 } from "lucide-react";
 import NoNotificationsFound from "../components/NoNotificationsFound.jsx";
-import { acceptFriendRequest, getFriendRequests } from "../lib/api.js";
+import { acceptFriendRequestAPI, getFriendRequestsAPI } from "../lib/api.js";
 
-import { capitalize } from "../lib/utils.js";
 import { getLanguageFlag } from "../components/FriendCard_v2.jsx";
+import { capitalize } from "../lib/utils.js";
 
 const NotificationsPage = () => {
   const queryClient = useQueryClient();
 
   const { data: friendRequests, isLoading } = useQuery({
     queryKey: ["getFriendRequests"],
-    queryFn: getFriendRequests,
+    queryFn: getFriendRequestsAPI,
   });
 
-  const { mutate: acceptFriendRequestMutation, isPending } = useMutation({
-    mutationFn: acceptFriendRequest,
-    onSuccess: () => {
-      queryClient.invalidateQueries({ queryKey: ["getFriendRequests"] });
-      queryClient.invalidateQueries({ queryKey: ["getFriends"] });
-      queryClient.invalidateQueries({ queryKey: ["getRecommendedUsers"] });
-    },
-  });
+  const { mutate: acceptFriendRequestMutation, isPending: isAccepting } =
+    useMutation({
+      mutationFn: acceptFriendRequestAPI,
+      onSuccess: () => {
+        queryClient.invalidateQueries({ queryKey: ["getFriendRequests"] });
+        queryClient.invalidateQueries({ queryKey: ["getFriends"] });
+        queryClient.invalidateQueries({ queryKey: ["getRecommendedUsers"] });
+      },
+    });
 
   const incomingFriendRequests = friendRequests?.friendRequests || [];
   const acceptedFriendRequests = friendRequests?.acceptedRequests || [];
@@ -38,12 +39,12 @@ const NotificationsPage = () => {
     <>
       <div className="p-4 sm:p-6 lg:p-8 min-h-[calc(100vh - 64px)] bg-base-100">
         <div className="w-full space-y-4 sm:space-y-6">
-          <h1 className="text-2xl sm:text-3xl font-bold mb-4 sm:mb-6">
+          <h1 className="text-2xl sm:text-2xl font-bold mb-4 sm:mb-6">
             Notifications
           </h1>
 
           {isLoading ? (
-            <div className="flex justify-center py-12">
+            <div className="flex justify-center h-[100px] items-center">
               <LoaderIcon className="animate-spin size-8" />
             </div>
           ) : (
@@ -105,7 +106,7 @@ const NotificationsPage = () => {
                                 onClick={() =>
                                   acceptFriendRequestMutation(request._id)
                                 }
-                                disabled={isPending}
+                                disabled={isAccepting}
                               >
                                 <Check />
                               </button>
@@ -114,7 +115,7 @@ const NotificationsPage = () => {
                                 onClick={() =>
                                   acceptFriendRequestMutation(request._id)
                                 }
-                                disabled={isPending}
+                                disabled={isAccepting}
                               >
                                 <X />
                               </button>

@@ -1,11 +1,15 @@
+import { useMutation } from "@tanstack/react-query";
 import { ArrowLeft, Hexagon, LoaderIcon } from "lucide-react";
 import { useState } from "react";
 import { Link, useNavigate } from "react-router";
-import { useSignUp } from "../hooks/useSignUp.js";
 import { showToast } from "../components/CostumedToast.jsx";
-import { axiosInstance } from "../lib/axiosInstance.js";
+import { signUpAPI, signUpVerificationAPI } from "../lib/api.js";
+import { deepTrimObj } from "../lib/utils.js";
+import { useTranslation } from "react-i18next";
+import LocaleSwitcher from "../components/LocaleSwitcher.jsx";
 
 const SignUpPage = () => {
+  const { t } = useTranslation("signUpPage");
   const navigate = useNavigate();
   const [signUpData, setSignUpData] = useState({
     fullName: "",
@@ -16,15 +20,76 @@ const SignUpPage = () => {
   const [verificationCode, setVerificationCode] = useState("");
   const [isCheckedPolicy, setIsCheckedPolicy] = useState(false);
 
-  const {
-    mutateAsync: signUpMutation,
-    isPending,
-    error,
-  } = useSignUp(signUpData);
+  const { mutateAsync: signUpMutation, isPending: isSigningUp } = useMutation({
+    mutationFn: (data) => signUpAPI(data),
+    onSuccess: (data) => {
+      showToast({
+        message:
+          data?.message ||
+          "Sign up successful! Please check your email for verification code.",
+        type: "success",
+      });
+      setStep(2);
+    },
+    onError: (error) => {
+      showToast({
+        message:
+          error?.response?.data?.message || "Sign up failed. Please try again.",
+        type: "error",
+      });
+    },
+  });
 
-  const validateSignUpData = (signUpData, isCheckedPolicy) => {
+  const {
+    mutateAsync: resendVerificationCodeMutation,
+    // isPending: isResendingVerificationCode,
+  } = useMutation({
+    mutationFn: (data) => signUpAPI(data),
+    onSuccess: (data) => {
+      showToast({
+        message:
+          data?.message || "Please check your email for verification code.",
+        type: "success",
+      });
+    },
+    onError: (error) => {
+      showToast({
+        message:
+          error?.response?.data?.message ||
+          "Failed to resend verification code",
+        type: "error",
+      });
+    },
+  });
+
+  const {
+    mutateAsync: signUpVerificationMutation,
+    isPending: isVerifyingCode,
+  } = useMutation({
+    mutationFn: signUpVerificationAPI,
+    onSuccess: (data) => {
+      showToast({
+        message: data?.message || "Sign up verification successful!",
+        type: "success",
+      });
+      navigate("/signin");
+    },
+    onError: (error) => {
+      console.error("Sign up verification error:", error);
+      showToast({
+        message:
+          error?.response?.data?.message || "Sign up verification failed",
+        type: "error",
+      });
+    },
+  });
+
+  const validateSignUpData = (rawData, isCheckedPolicy) => {
+    const signUpData = deepTrimObj(rawData);
+
     const nameIsValid = /^[A-Za-zÀ-ỹ\s]+$/.test(signUpData.fullName);
-    const emailIsValid = /^[^\s@]+@[^\s@]+\.[^\s@]+$/.test(signUpData.email);
+    const emailIsValid =
+      /^[a-zA-Z0-9._%+-]+@[a-zA-Z0-9.-]+\.[a-zA-Z]{2,}$/.test(signUpData.email);
     const passwordIsValid =
       signUpData.password.length >= 8 &&
       /[A-Z]/.test(signUpData.password) &&
@@ -33,39 +98,46 @@ const SignUpPage = () => {
       /[!@#$%^&*(),.?":{}|<>]/.test(signUpData.password);
 
     if (!signUpData.fullName || !signUpData.email || !signUpData.password) {
-      return "All fields are required";
+      return { message: "All fields are required", cleanedData: signUpData };
     } else if (!nameIsValid) {
-      return "Full name can only contain letters and spaces";
+      return {
+        message: "Full name can only contain letters and spaces",
+        cleanedData: signUpData,
+      };
     } else if (!emailIsValid) {
-      return "Invalid email format";
+      return { message: "Invalid email format", cleanedData: signUpData };
     } else if (!passwordIsValid) {
-      return "Password must be at least 8 characters long and include uppercase, lowercase, number, and special character";
+      return {
+        message:
+          "Password must be at least 8 characters long and include uppercase, lowercase, number, and special character",
+        cleanedData: signUpData,
+      };
     } else if (!isCheckedPolicy) {
-      return "You must accept the terms and conditions";
+      return {
+        message: "You must accept the terms and conditions",
+        cleanedData: signUpData,
+      };
     }
 
-    return null; // dữ liệu hợp lệ
+    return { message: null, cleanedData: signUpData };
   };
 
-  const handleCheckValidSignupData = async (e) => {
+  const handleSignup = async (e) => {
     e.preventDefault();
-    try {
-      const validationMessage = validateSignUpData(signUpData, isCheckedPolicy);
+    const { message, cleanedData } = validateSignUpData(
+      signUpData,
+      isCheckedPolicy
+    );
 
-      if (validationMessage) {
-        showToast({
-          message: validationMessage,
-          type: "error",
-        });
-        return;
-      }
-
-      await signUpMutation();
-      setStep(2);
+    if (message) {
       showToast({
-        message: "Please check your email for the verification code.",
-        type: "success",
+        message,
+        type: "error",
       });
+      return;
+    }
+    try {
+      signUpMutation(cleanedData);
     } catch (error) {
       console.error("Sign up failed:", error);
       showToast({
@@ -75,28 +147,46 @@ const SignUpPage = () => {
     }
   };
 
-  const handleSignUp = async (e) => {
-    e.preventDefault();
-    if (!verificationCode) {
+  const handleResendVerificationCode = async () => {
+    const { message, cleanedData } = validateSignUpData(
+      signUpData,
+      isCheckedPolicy
+    );
+    if (message) {
       showToast({
-        message: "Please enter the verification code",
+        message,
         type: "error",
       });
       return;
     }
     try {
-      const response = await axiosInstance.post("/auth/signup/verify-otp", {
-        otp: verificationCode,
-      });
-      navigate("/login");
-      showToast({
-        message: response.data.message || "Sign up successful! Please log in.",
-        type: "success",
-      });
+      await resendVerificationCodeMutation(cleanedData);
     } catch (error) {
-      console.error(error);
+      console.error("Resend verification code failed:", error);
       showToast({
-        message: error?.message || "Sign up failed. Please try again.",
+        message: error?.message || "Failed to resend verification code",
+        type: "error",
+      });
+    }
+  };
+
+  const handleSignUpVerification = async (e) => {
+    e.preventDefault();
+    const trimmedVerificationCode = verificationCode.trim();
+    if (!trimmedVerificationCode) {
+      showToast({
+        message: "Please enter verification code",
+        type: "error",
+      });
+      return;
+    }
+    try {
+      signUpVerificationMutation(trimmedVerificationCode);
+    } catch (error) {
+      console.error("Sign up verification failed:", error);
+      showToast({
+        message:
+          error?.message || "Sign up verification failed. Please try again.",
         type: "error",
       });
     }
@@ -108,7 +198,7 @@ const SignUpPage = () => {
         data-theme="night"
       >
         {step === 1 ? (
-          <div className="border border-primary/25 flex flex-col lg:flex-row w-full max-w-xl lg:max-w-5xl mx-auto bg-base-200 rounded-xl shadow-lg overflow-hidden">
+          <div className="border border-primary/25 flex flex-col lg:flex-row w-full max-w-xl lg:max-w-5xl mx-auto bg-base-200 rounded-xl shadow-lg">
             {/* SIGNUP FORM - LEFT SIDE */}
             <div className="w-full lg:w-1/2 p-8 flex flex-col">
               {/* LOGO */}
@@ -121,26 +211,28 @@ const SignUpPage = () => {
 
               <div className="w-full">
                 {/* arrow function need to pass event or else not working in onSubmit? */}
-                <form onSubmit={(e) => handleCheckValidSignupData(e)} action="">
+                <form onSubmit={(e) => handleSignup(e)} action="">
                   <div className="space-y-4">
                     <div>
                       <h2 className="text-xl font-semibold">
-                        Create an Account
+                        {t("leftSide.hero.title")}
                       </h2>
                       <p className="text-sm opacity-70">
-                        Join Chatify and start your language learning adventure!
+                        {t("leftSide.hero.subtitle")}
                       </p>
                     </div>
                     <div className="space-y-3">
                       {/* FULL NAME */}
                       <div className="form-control w-full">
                         <label className="label">
-                          <span className="label-text">Full Name</span>
+                          <span className="label-text">
+                            {t("leftSide.form.fullName.label")}
+                          </span>
                         </label>
                         <input
                           type="text"
-                          placeholder="Damian Duy"
-                          className="input input-bordered w-full"
+                          placeholder={t("leftSide.form.fullName.placeholder")}
+                          className="input input-bordered w-full text-sm"
                           value={signUpData.fullName}
                           onChange={(e) =>
                             setSignUpData({
@@ -154,12 +246,14 @@ const SignUpPage = () => {
                       {/* EMAIL */}
                       <div className="form-control w-full">
                         <label className="label">
-                          <span className="label-text">Email</span>
+                          <span className="label-text">
+                            {t("leftSide.form.email.label")}
+                          </span>
                         </label>
                         <input
                           type="text"
-                          placeholder="damianduy@example.com"
-                          className="input input-bordered w-full"
+                          placeholder={t("leftSide.form.email.placeholder")}
+                          className="input input-bordered w-full text-sm"
                           value={signUpData.email}
                           onChange={(e) =>
                             setSignUpData({
@@ -173,12 +267,14 @@ const SignUpPage = () => {
                       {/* PASSWORD */}
                       <div className="form-control w-full">
                         <label className="label">
-                          <span className="label-text">Password</span>
+                          <span className="label-text">
+                            {t("leftSide.form.password.label")}
+                          </span>
                         </label>
                         <input
                           type="password"
-                          placeholder="********"
-                          className="input input-bordered w-full"
+                          placeholder={t("leftSide.form.password.placeholder")}
+                          className="input input-bordered w-full text-sm"
                           value={signUpData.password}
                           onChange={(e) =>
                             setSignUpData({
@@ -204,13 +300,13 @@ const SignUpPage = () => {
                             }
                           />
                           <span className="text-xs leading-tight">
-                            I agree to the{" "}
+                            {t("leftSide.form.termsAndPolicy.label")}{" "}
                             <span className="text-primary hover:underline">
-                              terms of service
+                              {t("leftSide.form.termsAndPolicy.terms")}
                             </span>{" "}
-                            and{" "}
+                            {t("leftSide.form.termsAndPolicy.and")}{" "}
                             <span className="text-primary hover:underline">
-                              privacy policy
+                              {t("leftSide.form.termsAndPolicy.privacyPolicy")}
                             </span>
                           </span>
                         </label>
@@ -218,31 +314,38 @@ const SignUpPage = () => {
                     </div>
 
                     {/* SIGNUP BUTTON */}
-                    <button className="btn btn-primary w-full" type="submit">
-                      {false ? (
+                    <button
+                      className="btn btn-primary w-full"
+                      type="submit"
+                      disabled={isSigningUp}
+                    >
+                      {isSigningUp ? (
                         <>
                           <LoaderIcon className="animate-spin size-5" />
-                          Loading...
+                          {t("leftSide.form.signUpButton.loadingText")}
                         </>
                       ) : (
-                        "Create Account"
+                        t("leftSide.form.signUpButton.text")
                       )}
                     </button>
 
                     {/* REDIRECT LOGIN */}
                     <div className="text-center !mt-6">
                       <p className="text-sm">
-                        Already have an account?{" "}
+                        {t("leftSide.prompt.alreadyHaveAccount.text")}{" "}
                         <Link
-                          to="/login"
+                          to="/signin"
                           className="text-primary hover:underline"
                         >
-                          Sign in
+                          {t("leftSide.prompt.alreadyHaveAccount.linkText")}
                         </Link>
                       </p>
                     </div>
                   </div>
                 </form>
+                <div className="flex items-center justify-center mt-6">
+                  <LocaleSwitcher></LocaleSwitcher>
+                </div>
               </div>
             </div>
 
@@ -252,7 +355,7 @@ const SignUpPage = () => {
                 {/* Illustration */}
                 <div className="relative aspect-square max-w-sm mx-auto">
                   <img
-                    src="/signup_pic.png"
+                    src="/images/signup_pic.png"
                     alt="Language connection illustration"
                     className="w-full h-full"
                   />
@@ -271,9 +374,9 @@ const SignUpPage = () => {
             </div>
           </div>
         ) : (
-          <div className="border border-primary/25 flex flex-col lg:flex-row w-full max-w-xl mx-auto bg-base-200 rounded-xl shadow-lg overflow-hidden">
+          <div className="border border-primary/25 flex flex-col lg:flex-row w-full max-w-xl mx-auto bg-base-200 rounded-xl shadow-lg">
             <div className="w-full p-8 flex flex-col">
-              <form onSubmit={(e) => handleSignUp(e)} action="">
+              <form onSubmit={(e) => handleSignUpVerification(e)} action="">
                 <div className="space-y-4">
                   <div className="flex items-center gap-4">
                     <ArrowLeft
@@ -281,27 +384,35 @@ const SignUpPage = () => {
                       onClick={() => setStep(1)}
                     />
                     <div>
-                      <h2 className="text-xl font-semibold">Create Account</h2>
+                      <h2 className="text-xl font-semibold">
+                        {t("verificationStep.title")}
+                      </h2>
                       <p className="text-sm opacity-70">
-                        Check your signup email for the verification code
+                        {t("verificationStep.subtitle")}
                       </p>
                     </div>
                   </div>
                   <div className="space-y-3">
-                    {/* RESET CODE */}
                     <div className="form-control w-full">
                       <label className="label">
-                        <span className="label-text">Verification Code</span>
+                        <span className="label-text">
+                          {t("verificationStep.form.verificationCode.label")}
+                        </span>
                       </label>
                       <input
                         type="text"
-                        placeholder="Enter your verification code"
-                        className="input input-bordered w-full"
+                        placeholder={t(
+                          "verificationStep.form.verificationCode.placeholder"
+                        )}
+                        className="input input-bordered w-full text-sm"
                         value={verificationCode}
                         onChange={(e) => setVerificationCode(e.target.value)}
                       />
-                      <p className="text-sm text-primary hover:underline mt-2 text-end cursor-pointer">
-                        Resend
+                      <p
+                        className="text-sm text-primary hover:underline mt-2 text-end cursor-pointer"
+                        onClick={handleResendVerificationCode}
+                      >
+                        {t("verificationStep.form.resendCode.text")}
                       </p>
                     </div>
                   </div>
@@ -309,18 +420,22 @@ const SignUpPage = () => {
                   <button
                     className="btn btn-primary w-full !mt-6"
                     type="submit"
+                    disabled={isVerifyingCode}
                   >
-                    {true ? (
-                      "Confirm"
+                    {!isVerifyingCode ? (
+                      t("verificationStep.form.verifyButton.text")
                     ) : (
                       <>
                         <LoaderIcon className="animate-spin size-5" />
-                        Loading...
+                        {t("verificationStep.form.verifyButton.loadingText")}
                       </>
                     )}
                   </button>
                 </div>
               </form>
+              <div className="flex items-center justify-center mt-6">
+                <LocaleSwitcher></LocaleSwitcher>
+              </div>
             </div>
           </div>
         )}

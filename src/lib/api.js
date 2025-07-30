@@ -1,125 +1,126 @@
 import { axiosInstance } from "./axiosInstance";
+import Cookies from "js-cookie";
 
 export const signUpAPI = async (signUpData) => {
-  try {
-    const response = await axiosInstance.post("/auth/signup", signUpData);
-    return response.data;
-  } catch (error) {
-    console.error("Error during sign up:", error);
-    throw error.response?.data || { message: "Sign up failed" };
-  }
+  const response = await axiosInstance.post("/auth/signup", signUpData);
+  return response.data;
+};
+export const signUpVerificationAPI = async (otp) => {
+  const response = await axiosInstance.post("/auth/signup/verify-otp", {
+    otp,
+  });
+  return response.data;
 };
 
 export const loginAPI = async (loginData) => {
-  try {
-    const response = await axiosInstance.post("/auth/login", loginData);
-    return response.data;
-  } catch (error) {
-    console.error("Error during login:", error);
-    throw error.response?.data || { message: "Login failed" };
-  }
+  const response = await axiosInstance.post("/auth/login", loginData);
+  const jwt = response.data?.data;
+
+  Cookies.set("jwt", jwt, {
+    expires: 7,
+    secure: true,
+    sameSite: "Strict",
+    path: "/",
+  });
+  return response.data;
 };
+
 export const logoutAPI = async () => {
-  try {
-    const response = await axiosInstance.post("/auth/logout");
-    return response.data;
-  } catch (error) {
-    console.error("Error during logout:", error);
-    throw error.response?.data || { message: "Logout failed" };
-  }
+  const response = await axiosInstance.post("/auth/logout");
+  Cookies.remove("jwt", {
+    secure: true,
+    sameSite: "Strict",
+    path: "/",
+  });
+  return response.data;
 };
 
-export const getAuthUser = async () => {
-  try {
-    const response = await axiosInstance.get("/auth/me");
-    return response.data;
-  } catch (error) {
-    console.error("Error fetching user data:", error);
-    return null;
-  }
+export const getAuthUserAPI = async () => {
+  const response = await axiosInstance.get("/auth/me");
+  return response.data;
 };
 
-export const completeOnboarding = async (userData) => {
-  try {
-    const response = await axiosInstance.post("/auth/onboarding", userData);
-    return response.data;
-  } catch (error) {
-    console.error("Error completing onboarding:", error);
-    throw error.response?.data || { message: "Onboarding completion failed" };
-  }
+export const onboardingAPI = async (userData) => {
+  const response = await axiosInstance.put("/auth/onboarding", userData);
+  return response.data;
 };
 
-export const getFriends = async () => {
-  try {
-    const response = await axiosInstance.get("/user/friends");
-    return response.data;
-  } catch (error) {
-    console.error("Error fetching friends:", error);
-    throw error.response?.data || { message: "Fetching friends failed" };
-  }
+export const getFriendsAPI = async () => {
+  const response = await axiosInstance.get("/user/friends");
+  return response.data;
 };
 
-export const getRecommendedUsers = async () => {
-  try {
-    const response = await axiosInstance.get("/user");
-    return response.data;
-  } catch (error) {
-    console.error("Error fetching recommended users:", error);
-    throw (
-      error.response?.data || { message: "Fetching recommended users failed" }
-    );
-  }
+export const getRecommendedUsersAPI = async () => {
+  const response = await axiosInstance.get("/user");
+  return response.data;
 };
 
-export const getOutgoingFriendRequests = async () => {
-  try {
-    const response = await axiosInstance.get("/user/outgoing-friend-requests");
-    return response.data;
-  } catch (error) {
-    console.error("Error fetching outgoing friend requests:", error);
-    throw (
-      error.response?.data || { message: "Fetching outgoing requests failed" }
-    );
-  }
+export const getOutgoingFriendRequestsAPI = async () => {
+  const response = await axiosInstance.get("/user/outgoing-friend-requests");
+  return response.data;
 };
 
-export const sendFriendRequest = async (userId) => {
-  try {
-    const response = await axiosInstance.post(`/user/friend-request/${userId}`);
-    return response.data;
-  } catch (error) {
-    console.error("Error sending friend request:", error);
-    throw error.response?.data || { message: "Sending friend request failed" };
-  }
+export const sendFriendRequestAPI = async (userId) => {
+  const response = await axiosInstance.post(`/user/friend-request/${userId}`);
+  return response.data;
 };
 
-export const getFriendRequests = async () => {
-  try {
-    const response = await axiosInstance.get("/user/friend-requests");
-    return response.data;
-  } catch (error) {
-    console.error("Error fetching friend requests:", error);
-    throw (
-      error.response?.data || { message: "Fetching friend requests failed" }
-    );
-  }
+export const getFriendRequestsAPI = async () => {
+  const response = await axiosInstance.get("/user/friend-requests");
+  return response.data;
 };
 
-export const acceptFriendRequest = async (requestId) => {
-  try {
-    const response = await axiosInstance.put(
-      `/user/friend-request/${requestId}/accept`
-    );
-    return response.data;
-  } catch (error) {
-    console.error("Error accepting friend request:", error);
-    throw (
-      error.response?.data || { message: "Accepting friend request failed" }
-    );
-  }
+export const acceptFriendRequestAPI = async (requestId) => {
+  const response = await axiosInstance.put(
+    `/user/friend-request/${requestId}/accept`
+  );
+  return response.data;
 };
 
-export const getStreamToken = async () => {
+export const getStreamTokenAPI = async () => {
   const response = await axiosInstance.get("/chat/token");
+  return response.data;
+};
+
+export const resetPasswordAPI = async (email) => {
+  const response = await axiosInstance.post("/auth/reset-password", {
+    email,
+  });
+  return response.data;
+};
+
+export const resetPasswordVerificationAPI = async ({ newPassword, otp }) => {
+  const response = await axiosInstance.post("/auth/reset-password/verify-otp", {
+    newPassword,
+    otp,
+  });
+  return response.data;
+};
+
+export const changePasswordAPI = async ({ oldPassword, newPassword }) => {
+  const response = await axiosInstance.post("/auth/change-password", {
+    oldPassword,
+    newPassword,
+  });
+  return response.data;
+};
+
+export const changePasswordVerificationAPI = async (otp) => {
+  const response = await axiosInstance.post(
+    "/auth/change-password/verify-otp",
+    {
+      otp,
+    }
+  );
+  return response.data;
+};
+
+export const getNativeLanguagesAPI = async () => {
+  const response = await axiosInstance.get("/category/native-languages");
+  return response.data;
+};
+
+export const getLearningLanguagesAPI = async () => {
+  const response = await axiosInstance.get("/category/learning-languages");
   return response.data;
 };

@@ -1,0 +1,32 @@
+{
+  "hero": {
+    "title": "Complete Your Profile",
+    "genAvatarButton": "Generate Random Avatar"
+  },
+  "form": {
+    "fullName": {
+      "label": "Full Name",
+      "placeholder": "Enter your full name"
+    },
+    "bio": {
+      "label": "Bio",
+      "placeholder": "Tell others about yourself and your language learning goals"
+    },
+    "location": {
+      "label": "Location",
+      "placeholder": "Your city, state, or region"
+    },
+    "nativeLanguage": {
+      "label": "Native Language",
+      "placeholder": "Select your native language"
+    },
+    "learningLanguage": {
+      "label": "Learning Language",
+      "placeholder": "Select your learning language"
+    },
+    "button": {
+      "text": "Save and Continue",
+      "loadingText": "Saving..."
+    }
+  }
+}

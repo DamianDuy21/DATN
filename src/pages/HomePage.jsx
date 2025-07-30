@@ -7,12 +7,13 @@ import { FriendCard_v2 } from "../components/FriendCard_v2.jsx";
 import NoFriendsFound from "../components/NoFriendsFound.jsx";
 import { RecommendedUser } from "../components/RecommendedUser.jsx";
 import {
-  getFriendRequests,
-  getFriends,
-  getOutgoingFriendRequests,
-  getRecommendedUsers,
-  sendFriendRequest,
+  getFriendRequestsAPI,
+  getFriendsAPI,
+  getOutgoingFriendRequestsAPI,
+  getRecommendedUsersAPI,
+  sendFriendRequestAPI,
 } from "../lib/api.js";
+import { showToast } from "../components/CostumedToast.jsx";
 
 const HomePage = () => {
   const queryClient = useQueryClient();
@@ -21,7 +22,7 @@ const HomePage = () => {
 
   const { data: friends = [], isLoading: isLoadingGetFriends } = useQuery({
     queryKey: ["getFriends"],
-    queryFn: getFriends,
+    queryFn: getFriendsAPI,
   });
 
   const {
@@ -29,26 +30,43 @@ const HomePage = () => {
     isLoading: isLoadingGetRecommendedUsers,
   } = useQuery({
     queryKey: ["getRecommendedUsers"],
-    queryFn: getRecommendedUsers,
+    queryFn: getRecommendedUsersAPI,
   });
 
   const {
     data: outgoingFriendRequests,
-    // isLoading: isLoadingOutgoingFriendRequests,
+    isLoading: isLoadingOutgoingFriendRequests,
   } = useQuery({
     queryKey: ["getOutgoingFriendRequests"],
-    queryFn: getOutgoingFriendRequests,
+    queryFn: getOutgoingFriendRequestsAPI,
   });
 
-  const { data: incomingFriendRequests } = useQuery({
+  const {
+    data: incomingFriendRequests,
+    isLoading: isLoadingIncomingFriendRequests,
+  } = useQuery({
     queryKey: ["getIncomingFriendRequests"],
-    queryFn: getFriendRequests,
+    queryFn: getFriendRequestsAPI,
   });
 
-  const { mutate: sendFriendRequestMutation, isPending } = useMutation({
-    mutationFn: sendFriendRequest,
-    onSuccess: () => {
+  const {
+    mutate: sendFriendRequestMutation,
+    isPending: isSendingFriendRequest,
+  } = useMutation({
+    mutationFn: sendFriendRequestAPI,
+    onSuccess: (data) => {
       queryClient.invalidateQueries(["getOutgoingFriendRequests"]);
+      showToast({
+        message: data?.message || "Friend request sent successfully!",
+        type: "success",
+      });
+    },
+    onError: (error) => {
+      showToast({
+        message:
+          error?.response?.data?.message || "Failed to send friend request",
+        type: "error",
+      });
     },
   });
 
@@ -77,10 +95,10 @@ const HomePage = () => {
           <div>
             <div className="flex flex-col sm:flex-row items-start sm:items-center justify-between gap-4 mb-4 sm:mb-6">
               <div>
-                <h2 className="text-2xl sm:text-3xl font-bold">
+                <h2 className="text-2xl sm:text-2xl font-bold">
                   Recent Connections
                 </h2>
-                <p className="text-base-content opacity-70">
+                <p className="text-base-content opacity-70 text-sm">
                   Continue practicing new languages with your friends!
                 </p>
               </div>
@@ -92,7 +110,7 @@ const HomePage = () => {
             </div>
 
             {isLoadingGetFriends ? (
-              <div className="flex justify-center py-12">
+              <div className="flex justify-center h-[100px] items-center">
                 <LoaderIcon className="animate-spin size-8" />
               </div>
             ) : friends.length === 0 ? (
@@ -110,10 +128,10 @@ const HomePage = () => {
             <div className="mb-4 sm:mb-6">
               <div className="flex flex-col sm:flex-row items-start sm:items-center justify-between gap-4">
                 <div>
-                  <h2 className="text-2xl sm:text-3xl font-bold">
+                  <h2 className="text-2xl sm:text-2xl font-bold">
                     Meet New Learners
                   </h2>
-                  <p className="text-base-content opacity-70">
+                  <p className="text-base-content opacity-70 text-sm">
                     Discover perfect language exchange partners based on your
                     profile
                   </p>
@@ -122,15 +140,15 @@ const HomePage = () => {
             </div>
 
             {isLoadingGetRecommendedUsers ? (
-              <div className="flex justify-center py-12">
+              <div className="flex justify-center h-[100px] items-center">
                 <LoaderIcon className="animate-spin size-8" />
               </div>
             ) : recommendedUsers.length === 0 ? (
               <div className="card bg-base-200 p-6 text-center">
-                <h3 className="font-semibold text-lg mb-2">
+                <h3 className="font-semibold mb-2">
                   No recommendations available
                 </h3>
-                <p className="text-base-content opacity-70">
+                <p className="text-base-content opacity-70 text-sm">
                   Check back later for new language partners!
                 </p>
               </div>
@@ -140,13 +158,14 @@ const HomePage = () => {
                   const hasRequestBeenSent = outgoingRequestIds.has(user._id);
                   const hasIncomingRequest = incomingRequestIds.has(user._id);
                   return (
+                    // todo: add loading state for each user
                     <RecommendedUser
                       key={user._id}
                       user={user}
                       hasRequestBeenSent={hasRequestBeenSent}
                       hasIncomingRequest={hasIncomingRequest}
                       onClick={sendFriendRequestMutation}
-                      isPending={isPending}
+                      isPending={isSendingFriendRequest}
                     />
                   );
                 })}

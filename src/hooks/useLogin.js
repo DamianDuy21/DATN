@@ -1,32 +1,32 @@
 import { useMutation, useQueryClient } from "@tanstack/react-query";
 import { loginAPI } from "../lib/api";
-import { showToast } from "../components/CostumedToast";
+import { showToast } from "../components/CostumedToast.jsx";
+import toast from "react-hot-toast";
 
-export const useLogin = (loginData) => {
+export const useLogin = () => {
   const queryClient = useQueryClient();
-  const { mutate, isPending, error } = useMutation({
+  const { mutateAsync, isPending, error } = useMutation({
     // mutationKey: ["signUp"],
-    mutationFn: () => loginAPI(loginData),
+    mutationFn: (loginData) => loginAPI(loginData),
     // update getMe in App.jsx
     onSuccess: () => {
       queryClient.invalidateQueries({
         queryKey: ["authUser"],
       });
       showToast({
-        message: "Sign in successful! Welcome back.",
+        message: "Sign in successful!",
         type: "success",
       });
     },
     onError: (error) => {
-      console.error("Login error:", error);
       showToast({
-        message: error?.message || "Login failed. Please try again.",
+        message: error?.response?.data?.message || "Sign in failed",
         type: "error",
       });
     },
   });
   return {
-    mutate,
+    mutateAsync,
     isPending,
     error,
   };

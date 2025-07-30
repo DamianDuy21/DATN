@@ -1,30 +1,70 @@
-import { useQueryClient } from "@tanstack/react-query";
 import {
   CameraIcon,
-  Hexagon,
-  KeyRound,
   LoaderIcon,
   MapPinIcon,
   RotateCcwKey,
   ShuffleIcon,
 } from "lucide-react";
-import { useState } from "react";
+import { useEffect, useState } from "react";
 import toast from "react-hot-toast";
+import { Link } from "react-router";
 import { LANGUAGES } from "../constants/index.js"; // Assuming you have a languages constant file
 import { useAuthUser } from "../hooks/useAuthUser";
-import { Link } from "react-router";
+import { useMutation } from "@tanstack/react-query";
+import { getLearningLanguagesAPI, getNativeLanguagesAPI } from "../lib/api.js";
+import { showToast } from "../components/CostumedToast.jsx";
+import CostumedSelect from "../components/CostumedSelect.jsx";
 
 const ProfilePage = () => {
   const { authUser } = useAuthUser();
-  console.log("Auth User:", authUser);
-  const queryClient = useQueryClient();
+
   const [formState, setFormState] = useState({
     fullName: authUser?.fullName || "",
     bio: authUser?.bio || "",
-    nativeLanguage: authUser?.nativeLanguage || "",
-    learningLanguage: authUser?.learningLanguage || "",
+    nativeLanguage: authUser?.nativeLanguage.name || "",
+    learningLanguage: authUser?.learningLanguage.name || "",
     location: authUser?.location || "",
     profilePic: authUser?.profilePic || "",
+  });
+
+  const [nativeLanguageSelection, setNativeLanguageSelection] = useState([]);
+  const [learningLanguageSelection, setLearningLanguageSelection] = useState(
+    []
+  );
+
+  const [nativeLanguage, setNativeLanguage] = useState(
+    authUser?.nativeLanguage || ""
+  );
+  const [learningLanguage, setLearningLanguage] = useState(
+    authUser?.learningLanguage || ""
+  );
+
+  const { mutate: getNativeLanguagesMutation } = useMutation({
+    mutationFn: getNativeLanguagesAPI,
+    onSuccess: (data) => {
+      setNativeLanguageSelection(data?.data);
+    },
+    onError: (error) => {
+      showToast({
+        message:
+          error.response.data.message || "Failed to fetch native languages",
+        type: "error",
+      });
+    },
+  });
+
+  const { mutate: getLearningLanguagesMutation } = useMutation({
+    mutationFn: getLearningLanguagesAPI,
+    onSuccess: (data) => {
+      setLearningLanguageSelection(data?.data);
+    },
+    onError: (error) => {
+      showToast({
+        message:
+          error.response.data.message || "Failed to fetch learning languages",
+        type: "error",
+      });
+    },
   });
 
   const handleRandomAvatar = () => {
@@ -32,13 +72,21 @@ const ProfilePage = () => {
     const randomAvatar = `https://avatar.iran.liara.run/public/${idx}.png`;
 
     setFormState({ ...formState, profilePic: randomAvatar });
-    toast.success("Random profile picture generated!");
+    showToast({
+      message: "Random avatar generated successfully!",
+      type: "success",
+    });
   };
 
   const handleSubmit = (e) => {
     e.preventDefault();
     // onboardingMutation(formState);
   };
+
+  useEffect(() => {
+    getNativeLanguagesMutation();
+    getLearningLanguagesMutation();
+  }, []);
 
   return (
     <>
@@ -62,7 +110,7 @@ const ProfilePage = () => {
                     />
                   ) : (
                     <div className="flex items-center justify-center h-full">
-                      <CameraIcon className="size-12 text-base-content opacity-40" />
+                      {/* <CameraIcon className="size-12 text-base-content opacity-40" /> */}
                     </div>
                   )}
                 </div>
@@ -80,7 +128,7 @@ const ProfilePage = () => {
                 </div>
               </div>
 
-              {/* FULL NAME */}
+              {/* EMAIL */}
               <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
                 <div className="form-control">
                   <label className="label">
@@ -90,8 +138,8 @@ const ProfilePage = () => {
                     type="text"
                     name="email"
                     value={authUser.email}
-                    className="input input-bordered w-full pointer-events-none"
-                    placeholder="Your email"
+                    className="input input-bordered w-full pointer-events-none text-sm"
+                    placeholder="Enter your email"
                   />
                 </div>
                 <div className="form-control">
@@ -105,8 +153,8 @@ const ProfilePage = () => {
                     onChange={(e) =>
                       setFormState({ ...formState, fullName: e.target.value })
                     }
-                    className="input input-bordered w-full"
-                    placeholder="Your full name"
+                    className="input input-bordered w-full pointer-events-none text-sm"
+                    placeholder="Enter your full name"
                   />
                 </div>
               </div>
@@ -141,7 +189,7 @@ const ProfilePage = () => {
                   <label className="label">
                     <span className="label-text">Native Language</span>
                   </label>
-                  <select
+                  {/* <select
                     name="nativeLanguage"
                     value={formState.nativeLanguage.toLowerCase()}
                     onChange={(e) =>
@@ -158,7 +206,13 @@ const ProfilePage = () => {
                         {lang}
                       </option>
                     ))}
-                  </select>
+                  </select> */}
+                  <CostumedSelect
+                    placeholder="Select your native language"
+                    options={nativeLanguageSelection}
+                    onSelect={(option) => setNativeLanguage(option)}
+                    defaultValue={nativeLanguage}
+                  />
                 </div>
 
                 {/* LEARNING LANGUAGE */}
@@ -166,7 +220,7 @@ const ProfilePage = () => {
                   <label className="label">
                     <span className="label-text">Learning Language</span>
                   </label>
-                  <select
+                  {/* <select
                     name="learningLanguage"
                     value={formState.learningLanguage.toLowerCase()}
                     onChange={(e) =>
@@ -186,7 +240,13 @@ const ProfilePage = () => {
                         {lang}
                       </option>
                     ))}
-                  </select>
+                  </select> */}
+                  <CostumedSelect
+                    placeholder="Select your learning language"
+                    options={learningLanguageSelection}
+                    onSelect={(option) => setLearningLanguage(option)}
+                    defaultValue={learningLanguage}
+                  />
                 </div>
               </div>
 
@@ -204,7 +264,7 @@ const ProfilePage = () => {
                     onChange={(e) =>
                       setFormState({ ...formState, location: e.target.value })
                     }
-                    className="input input-bordered w-full pl-10"
+                    className="input input-bordered w-full pl-10 text-sm"
                     placeholder="City, Country"
                   />
                 </div>

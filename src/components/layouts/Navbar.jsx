@@ -5,6 +5,7 @@ import { Link, useLocation } from "react-router";
 import { useAuthUser } from "../../hooks/useAuthUser";
 import { useLogout } from "../../hooks/useLogout";
 import ThemeSelector from "../ThemeSelector";
+import LocaleSwitcher from "../LocaleSwitcher";
 const Navbar = () => {
   const { authUser } = useAuthUser();
   const location = useLocation();
@@ -59,8 +60,10 @@ const Navbar = () => {
                   <BellIcon className="h-5 w-5 text-base-content opacity-70" />
                 </button>
               </Link>
-              {/* TODO */}
+
               <ThemeSelector />
+
+              <LocaleSwitcher />
 
               <div className="avatar">
                 <Link to={`/profile`}>

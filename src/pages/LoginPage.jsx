@@ -1,38 +1,44 @@
 import { Hexagon, LoaderIcon } from "lucide-react";
 import { useState } from "react";
+import { useTranslation } from "react-i18next";
 import { Link } from "react-router";
-import { useLogin } from "../hooks/useLogin.js";
 import { showToast } from "../components/CostumedToast.jsx";
+import LocaleSwitcher from "../components/LocaleSwitcher.jsx";
+import { useLogin } from "../hooks/useLogin.js";
+import { deepTrimObj } from "../lib/utils.js";
 
 const LoginPage = () => {
+  const { t } = useTranslation("loginPage");
   const [loginData, setLoginData] = useState({
     email: "",
     password: "",
   });
   const [isCheckedPolicy, setIsCheckedPolicy] = useState(false);
 
-  const { mutate: loginMutation, isPending, error } = useLogin(loginData);
+  const { mutateAsync: loginMutation, isPending: isLoggingIn } = useLogin();
 
   const handleLogin = async (e) => {
     e.preventDefault();
+    const cleanedLoginData = deepTrimObj(loginData);
+    if (!cleanedLoginData.email || !cleanedLoginData.password) {
+      showToast({
+        message: "Email and password are required",
+        type: "error",
+      });
+      return;
+    } else if (!isCheckedPolicy) {
+      showToast({
+        message: "You must accept the terms and conditions",
+        type: "error",
+      });
+      return;
+    }
     try {
-      if (!loginData.email || !loginData.password) {
-        showToast({
-          message: "Email and password are required",
-          type: "error",
-        });
-      } else if (!isCheckedPolicy) {
-        showToast({
-          message: "You must accept the terms and conditions",
-          type: "error",
-        });
-      } else {
-        loginMutation();
-      }
+      loginMutation(cleanedLoginData);
     } catch (error) {
       console.error(error);
       showToast({
-        message: error?.message || "Login failed. Please try again.",
+        message: error?.message || "Sign in failed. Please try again.",
         type: "error",
       });
     }
@@ -43,7 +49,7 @@ const LoginPage = () => {
         className="flex items-center justify-center h-screen p-4 sm:p-6 md:p-8"
         data-theme="night"
       >
-        <div className="border border-primary/25 flex flex-col lg:flex-row w-full max-w-xl lg:max-w-5xl mx-auto bg-base-200 rounded-xl shadow-lg overflow-hidden">
+        <div className="border border-primary/25 flex flex-col lg:flex-row w-full max-w-xl lg:max-w-5xl mx-auto bg-base-200 rounded-xl shadow-lg">
           {/* SIGNUP FORM - LEFT SIDE */}
           <div className="w-full lg:w-1/2 p-8 flex flex-col">
             {/* LOGO */}
@@ -59,21 +65,25 @@ const LoginPage = () => {
               <form onSubmit={(e) => handleLogin(e)} action="">
                 <div className="space-y-4">
                   <div>
-                    <h2 className="text-xl font-semibold">Welcome back</h2>
+                    <h2 className="text-xl font-semibold">
+                      {t("leftSide.hero.title")}
+                    </h2>
                     <p className="text-sm opacity-70">
-                      Sign in to continue your language journey
+                      {t("leftSide.hero.subtitle")}
                     </p>
                   </div>
                   <div className="space-y-3">
                     {/* EMAIL */}
                     <div className="form-control w-full">
                       <label className="label">
-                        <span className="label-text">Email</span>
+                        <span className="label-text">
+                          {t("leftSide.form.email.label")}
+                        </span>
                       </label>
                       <input
                         type="text"
-                        placeholder="damianduy@example.com"
-                        className="input input-bordered w-full"
+                        placeholder={t("leftSide.form.email.placeholder")}
+                        className="input input-bordered w-full text-sm"
                         value={loginData.email}
                         onChange={(e) =>
                           setLoginData({
@@ -87,12 +97,14 @@ const LoginPage = () => {
                     {/* PASSWORD */}
                     <div className="form-control w-full">
                       <label className="label">
-                        <span className="label-text">Password</span>
+                        <span className="label-text">
+                          {t("leftSide.form.password.label")}
+                        </span>
                       </label>
                       <input
                         type="password"
-                        placeholder="********"
-                        className="input input-bordered w-full"
+                        placeholder={t("leftSide.form.password.placeholder")}
+                        className="input input-bordered w-full text-sm"
                         value={loginData.password}
                         onChange={(e) =>
                           setLoginData({
@@ -118,13 +130,13 @@ const LoginPage = () => {
                           }}
                         />
                         <span className="text-xs leading-tight">
-                          I agree to the{" "}
+                          {t("leftSide.form.termsAndPolicy.label")}{" "}
                           <span className="text-primary hover:underline">
-                            terms of service
+                            {t("leftSide.form.termsAndPolicy.terms")}
                           </span>{" "}
-                          and{" "}
+                          {t("leftSide.form.termsAndPolicy.and")}{" "}
                           <span className="text-primary hover:underline">
-                            privacy policy
+                            {t("leftSide.form.termsAndPolicy.privacyPolicy")}
                           </span>
                         </span>
                       </label>
@@ -132,49 +144,58 @@ const LoginPage = () => {
                   </div>
 
                   {/* SIGNUP BUTTON */}
-                  <button className="btn btn-primary w-full" type="submit">
-                    {isPending ? (
+                  <button
+                    className="btn btn-primary w-full"
+                    type="submit"
+                    disabled={isLoggingIn}
+                  >
+                    {isLoggingIn ? (
                       <>
                         <LoaderIcon className="animate-spin size-5" />
-                        Loading...
+                        {t("leftSide.form.signInButton.loadingText")}
                       </>
                     ) : (
-                      "Sign in"
+                      t("leftSide.form.signInButton.text")
                     )}
                   </button>
 
-                  {/* REDIRECT LOGIN */}
+                  {/* REDIRECT SIGNIN */}
                   <div className="text-center !mt-6">
                     <p className="text-sm">
-                      Don't have an account?{" "}
+                      {t("leftSide.prompt.noAccount.text")}{" "}
                       <Link
                         to="/signup"
                         className="text-primary hover:underline"
                       >
-                        Sign up
+                        {t("leftSide.prompt.noAccount.linkText")}
                       </Link>
                     </p>
                   </div>
 
                   <div className="flex items-center gap-4">
                     <div className="flex-1 h-px bg-gray-600"></div>
-                    <span className="text-gray-500 text-sm">or</span>
+                    <span className="text-gray-500 text-sm">
+                      {t("leftSide.prompt.or")}
+                    </span>
                     <div className="flex-1 h-px bg-gray-600"></div>
                   </div>
 
                   <div className="text-center mt-4">
                     <p className="text-sm">
-                      Forgot your password?{" "}
+                      {t("leftSide.prompt.forgotPassword.text")}{" "}
                       <Link
                         to="/forgot-password"
                         className="text-primary hover:underline"
                       >
-                        Reset it
+                        {t("leftSide.prompt.forgotPassword.linkText")}
                       </Link>
                     </p>
                   </div>
                 </div>
               </form>
+              <div className="flex items-center justify-center mt-6">
+                <LocaleSwitcher></LocaleSwitcher>
+              </div>
             </div>
           </div>
 
@@ -184,7 +205,7 @@ const LoginPage = () => {
               {/* Illustration */}
               <div className="relative aspect-square max-w-sm mx-auto">
                 <img
-                  src="/signup_pic.png"
+                  src="/images/signup_pic.png"
                   alt="Language connection illustration"
                   className="w-full h-full"
                 />
@@ -192,12 +213,9 @@ const LoginPage = () => {
 
               <div className="text-center space-y-3 mt-6">
                 <h2 className="text-xl font-semibold">
-                  Connect with language partners worldwide
+                  {t("rightSide.title")}
                 </h2>
-                <p className="opacity-70 text-sm">
-                  Practice conversations, make friends, and improve your
-                  language skills together
-                </p>
+                <p className="opacity-70 text-sm">{t("rightSide.subtitle")}</p>
               </div>
             </div>
           </div>

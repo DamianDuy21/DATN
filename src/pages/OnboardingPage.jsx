@@ -1,19 +1,29 @@
-import { useState } from "react";
-import { useAuthUser } from "../hooks/useAuthUser";
 import { useMutation, useQueryClient } from "@tanstack/react-query";
-import toast from "react-hot-toast";
-import { completeOnboarding } from "../lib/api";
-import {
-  CameraIcon,
-  Hexagon,
-  LoaderIcon,
-  MapPinIcon,
-  ShuffleIcon,
-} from "lucide-react";
+import { CameraIcon, LoaderIcon, MapPinIcon, ShuffleIcon } from "lucide-react";
+import { useEffect, useState } from "react";
+
+import CostumedSelect from "../components/CostumedSelect.jsx";
 import { LANGUAGES } from "../constants/index.js"; // Assuming you have a languages constant file
+import { useAuthUser } from "../hooks/useAuthUser";
+import {
+  getLearningLanguagesAPI,
+  getNativeLanguagesAPI,
+  onboardingAPI,
+} from "../lib/api";
+import { deepTrimObj } from "../lib/utils.js";
+import { showToast } from "../components/CostumedToast.jsx";
+import { useTranslation } from "react-i18next";
+import LocaleSwitcher from "../components/LocaleSwitcher.jsx";
 
 const OnboardingPage = () => {
+  const { t } = useTranslation("onboardingPage");
   const { authUser } = useAuthUser();
+
+  const [nativeLanguageSelection, setNativeLanguageSelection] = useState([]);
+  const [learningLanguageSelection, setLearningLanguageSelection] = useState(
+    []
+  );
+
   const queryClient = useQueryClient();
   const [formState, setFormState] = useState({
     fullName: authUser?.fullName || "",
@@ -23,17 +33,57 @@ const OnboardingPage = () => {
     location: authUser?.location || "",
     profilePic: authUser?.profilePic || "",
   });
+  const [nativeLanguage, setNativeLanguage] = useState(
+    authUser?.nativeLanguage || ""
+  );
+  const [learningLanguage, setLearningLanguage] = useState(
+    authUser?.learningLanguage || ""
+  );
+  const [isAvatarGeneratedFirstTime, setIsAvatarGeneratedFirstTime] =
+    useState(true);
 
-  const { mutate: onboardingMutation, isPending } = useMutation({
-    mutationFn: completeOnboarding,
-    onSuccess: () => {
-      toast.success("Onboarding completed successfully!");
+  const { mutate: getNativeLanguagesMutation } = useMutation({
+    mutationFn: getNativeLanguagesAPI,
+    onSuccess: (data) => {
+      setNativeLanguageSelection(data?.data);
+    },
+    onError: (error) => {
+      showToast({
+        message:
+          error.response.data.message || "Failed to fetch native languages",
+        type: "error",
+      });
+    },
+  });
+
+  const { mutate: getLearningLanguagesMutation } = useMutation({
+    mutationFn: getLearningLanguagesAPI,
+    onSuccess: (data) => {
+      setLearningLanguageSelection(data?.data);
+    },
+    onError: (error) => {
+      showToast({
+        message:
+          error.response.data.message || "Failed to fetch learning languages",
+        type: "error",
+      });
+    },
+  });
+
+  const { mutate: onboardingMutation, isPending: isOnboarding } = useMutation({
+    mutationFn: onboardingAPI,
+    onSuccess: (data) => {
+      showToast({
+        message: data?.message || "Onboarding completed successfully!",
+        type: "success",
+      });
       queryClient.invalidateQueries({ queryKey: ["authUser"] });
     },
     onError: (error) => {
-      toast.error(
-        error.response.data.message || "Failed to complete onboarding"
-      );
+      showToast({
+        message: error.response.data.message || "Failed to complete onboarding",
+        type: "error",
+      });
     },
   });
 
@@ -42,13 +92,44 @@ const OnboardingPage = () => {
     const randomAvatar = `https://avatar.iran.liara.run/public/${idx}.png`;
 
     setFormState({ ...formState, profilePic: randomAvatar });
-    toast.success("Random profile picture generated!");
+    if (!isAvatarGeneratedFirstTime) {
+      showToast({
+        message: "Random avatar generated successfully!",
+        type: "success",
+      });
+    }
+    setIsAvatarGeneratedFirstTime(false);
   };
 
   const handleSubmit = (e) => {
     e.preventDefault();
-    onboardingMutation(formState);
+    const trimmedFormState = deepTrimObj(formState);
+    trimmedFormState.nativeLanguageId = nativeLanguage.id;
+    trimmedFormState.learningLanguageId = learningLanguage.id;
+    try {
+      const onboardingData = {
+        bio: trimmedFormState.bio,
+        location: trimmedFormState.location,
+        nativeLanguageId: trimmedFormState.nativeLanguageId,
+        learningLanguageId: trimmedFormState.learningLanguageId,
+      };
+      onboardingMutation(onboardingData);
+    } catch (error) {
+      console.error("Onboarding failed:", error);
+      showToast({
+        message: error?.message || "Onboarding failed. Please try again.",
+        type: "error",
+      });
+    }
   };
+
+  useEffect(() => {
+    handleRandomAvatar();
+  }, [authUser]);
+  useEffect(() => {
+    getNativeLanguagesMutation();
+    getLearningLanguagesMutation();
+  }, []);
 
   return (
     <>
@@ -59,7 +140,7 @@ const OnboardingPage = () => {
         <div className="card bg-base-200 w-full max-w-3xl shadow-xl">
           <div className="card-body p-8">
             <h1 className="text-3xl font-bold text-center mb-4">
-              Complete Your Profile
+              {t("hero.title")}
             </h1>
 
             <form action="" onSubmit={handleSubmit} className="space-y-3">
@@ -75,7 +156,7 @@ const OnboardingPage = () => {
                     />
                   ) : (
                     <div className="flex items-center justify-center h-full">
-                      <CameraIcon className="size-12 text-base-content opacity-40" />
+                      {/* <CameraIcon className="size-12 text-base-content opacity-40" /> */}
                     </div>
                   )}
                 </div>
@@ -88,7 +169,7 @@ const OnboardingPage = () => {
                     className="btn btn-accent"
                   >
                     <ShuffleIcon className="size-4" />
-                    Generate Random Avatar
+                    {t("hero.genAvatarButton")}
                   </button>
                 </div>
               </div>
@@ -96,7 +177,7 @@ const OnboardingPage = () => {
               {/* FULL NAME */}
               <div className="form-control">
                 <label className="label">
-                  <span className="label-text">Full Name</span>
+                  <span className="label-text">{t("form.fullName.label")}</span>
                 </label>
                 <input
                   type="text"
@@ -105,15 +186,15 @@ const OnboardingPage = () => {
                   onChange={(e) =>
                     setFormState({ ...formState, fullName: e.target.value })
                   }
-                  className="input input-bordered w-full"
-                  placeholder="Your full name"
+                  className="input input-bordered w-full pointer-events-none text-sm"
+                  placeholder={t("form.fullName.placeholder")}
                 />
               </div>
 
               {/* BIO */}
               <div className="form-control">
                 <label className="label">
-                  <span className="label-text">Bio</span>
+                  <span className="label-text">{t("form.bio.label")}</span>
                 </label>
                 <textarea
                   name="bio"
@@ -122,7 +203,7 @@ const OnboardingPage = () => {
                     setFormState({ ...formState, bio: e.target.value })
                   }
                   className="textarea textarea-bordered h-24"
-                  placeholder="Tell others about yourself and your language learning goals"
+                  placeholder={t("form.bio.placeholder")}
                 />
               </div>
 
@@ -131,9 +212,11 @@ const OnboardingPage = () => {
                 {/* NATIVE LANGUAGE */}
                 <div className="form-control">
                   <label className="label">
-                    <span className="label-text">Native Language</span>
+                    <span className="label-text">
+                      {t("form.nativeLanguage.label")}
+                    </span>
                   </label>
-                  <select
+                  {/* <select
                     name="nativeLanguage"
                     value={formState.nativeLanguage}
                     onChange={(e) =>
@@ -142,7 +225,7 @@ const OnboardingPage = () => {
                         nativeLanguage: e.target.value,
                       })
                     }
-                    className="select select-bordered w-full"
+                    className="select select-bordered w-full custom-select"
                   >
                     <option value="">Select your native language</option>
                     {LANGUAGES.map((lang) => (
@@ -150,15 +233,22 @@ const OnboardingPage = () => {
                         {lang}
                       </option>
                     ))}
-                  </select>
+                  </select> */}
+                  <CostumedSelect
+                    placeholder={t("form.nativeLanguage.placeholder")}
+                    options={nativeLanguageSelection}
+                    onSelect={(option) => setNativeLanguage(option)}
+                  />
                 </div>
 
                 {/* LEARNING LANGUAGE */}
                 <div className="form-control">
                   <label className="label">
-                    <span className="label-text">Learning Language</span>
+                    <span className="label-text">
+                      {t("form.learningLanguage.label")}
+                    </span>
                   </label>
-                  <select
+                  {/* <select
                     name="learningLanguage"
                     value={formState.learningLanguage}
                     onChange={(e) =>
@@ -178,14 +268,19 @@ const OnboardingPage = () => {
                         {lang}
                       </option>
                     ))}
-                  </select>
+                  </select> */}
+                  <CostumedSelect
+                    placeholder={t("form.learningLanguage.placeholder")}
+                    options={learningLanguageSelection}
+                    onSelect={(option) => setLearningLanguage(option)}
+                  />
                 </div>
               </div>
 
               {/* LOCATION */}
               <div className="form-control">
                 <label className="label">
-                  <span className="label-text">Location</span>
+                  <span className="label-text">{t("form.location.label")}</span>
                 </label>
                 <div className="relative">
                   <MapPinIcon className="absolute top-1/2 transform -translate-y-1/2 left-3 size-5 text-base-content opacity-70" />
@@ -196,8 +291,8 @@ const OnboardingPage = () => {
                     onChange={(e) =>
                       setFormState({ ...formState, location: e.target.value })
                     }
-                    className="input input-bordered w-full pl-10"
-                    placeholder="City, Country"
+                    className="input input-bordered w-full pl-10 text-sm"
+                    placeholder={t("form.location.placeholder")}
                   />
                 </div>
               </div>
@@ -205,19 +300,22 @@ const OnboardingPage = () => {
               {/* SUBMIT BUTTON */}
               <button
                 className="btn btn-primary w-full !mt-6"
-                disabled={isPending}
+                disabled={isOnboarding}
                 type="submit"
               >
-                {!isPending ? (
-                  <>Complete Onboarding</>
+                {!isOnboarding ? (
+                  <>{t("form.button.text")}</>
                 ) : (
                   <>
                     <LoaderIcon className="animate-spin size-5" />
-                    Onboarding...
+                    {t("form.button.loadingText")}
                   </>
                 )}
               </button>
             </form>
+            <div className="flex items-center justify-center mt-6">
+              <LocaleSwitcher></LocaleSwitcher>
+            </div>
           </div>
         </div>
       </div>
