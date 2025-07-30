@@ -24,9 +24,7 @@ const SignUpPage = () => {
     mutationFn: (data) => signUpAPI(data),
     onSuccess: (data) => {
       showToast({
-        message:
-          data?.message ||
-          "Sign up successful! Please check your email for verification code.",
+        message: data?.message || t("toast.signUpMutation.success"),
         type: "success",
       });
       setStep(2);
@@ -34,7 +32,7 @@ const SignUpPage = () => {
     onError: (error) => {
       showToast({
         message:
-          error?.response?.data?.message || "Sign up failed. Please try again.",
+          error?.response?.data?.message || t("toast.handleSignup.error"),
         type: "error",
       });
     },
@@ -48,7 +46,7 @@ const SignUpPage = () => {
     onSuccess: (data) => {
       showToast({
         message:
-          data?.message || "Please check your email for verification code.",
+          data?.message || t("toast.resendVerificationCodeMutation.success"),
         type: "success",
       });
     },
@@ -56,7 +54,7 @@ const SignUpPage = () => {
       showToast({
         message:
           error?.response?.data?.message ||
-          "Failed to resend verification code",
+          t("toast.resendVerificationCodeMutation.error"),
         type: "error",
       });
     },
@@ -69,7 +67,7 @@ const SignUpPage = () => {
     mutationFn: signUpVerificationAPI,
     onSuccess: (data) => {
       showToast({
-        message: data?.message || "Sign up verification successful!",
+        message: data?.message || t("toast.signUpVerificationMutation.success"),
         type: "success",
       });
       navigate("/signin");
@@ -78,7 +76,8 @@ const SignUpPage = () => {
       console.error("Sign up verification error:", error);
       showToast({
         message:
-          error?.response?.data?.message || "Sign up verification failed",
+          error?.response?.data?.message ||
+          t("toast.signUpVerificationMutation.error"),
         type: "error",
       });
     },
@@ -98,23 +97,28 @@ const SignUpPage = () => {
       /[!@#$%^&*(),.?":{}|<>]/.test(signUpData.password);
 
     if (!signUpData.fullName || !signUpData.email || !signUpData.password) {
-      return { message: "All fields are required", cleanedData: signUpData };
+      return {
+        message: t("toast.validateSignUpData.allFieldsAreRequired"),
+        cleanedData: signUpData,
+      };
     } else if (!nameIsValid) {
       return {
-        message: "Full name can only contain letters and spaces",
+        message: t("toast.validateSignUpData.invalidFullName"),
         cleanedData: signUpData,
       };
     } else if (!emailIsValid) {
-      return { message: "Invalid email format", cleanedData: signUpData };
+      return {
+        message: t("toast.validateSignUpData.invalidEmail"),
+        cleanedData: signUpData,
+      };
     } else if (!passwordIsValid) {
       return {
-        message:
-          "Password must be at least 8 characters long and include uppercase, lowercase, number, and special character",
+        message: t("toast.validateSignUpData.invalidPassword"),
         cleanedData: signUpData,
       };
     } else if (!isCheckedPolicy) {
       return {
-        message: "You must accept the terms and conditions",
+        message: t("toast.validateSignUpData.termsAndPolicyNotAgreed"),
         cleanedData: signUpData,
       };
     }
@@ -141,7 +145,7 @@ const SignUpPage = () => {
     } catch (error) {
       console.error("Sign up failed:", error);
       showToast({
-        message: error?.message || "Sign up failed. Please try again.",
+        message: error?.message || t("toast.handleSignup.error"),
         type: "error",
       });
     }
@@ -164,7 +168,8 @@ const SignUpPage = () => {
     } catch (error) {
       console.error("Resend verification code failed:", error);
       showToast({
-        message: error?.message || "Failed to resend verification code",
+        message:
+          error?.message || t("toast.resendVerificationCodeMutation.error"),
         type: "error",
       });
     }
@@ -175,7 +180,7 @@ const SignUpPage = () => {
     const trimmedVerificationCode = verificationCode.trim();
     if (!trimmedVerificationCode) {
       showToast({
-        message: "Please enter verification code",
+        message: t("validateSignUpData.emptyVerificationCode"),
         type: "error",
       });
       return;
@@ -185,8 +190,7 @@ const SignUpPage = () => {
     } catch (error) {
       console.error("Sign up verification failed:", error);
       showToast({
-        message:
-          error?.message || "Sign up verification failed. Please try again.",
+        message: error?.message || t("toast.handleSignUpVerification.error"),
         type: "error",
       });
     }
@@ -194,7 +198,7 @@ const SignUpPage = () => {
   return (
     <>
       <div
-        className="flex items-center justify-center h-screen p-4 sm:p-6 md:p-8"
+        className="flex items-center justify-center min-h-screen p-4 sm:p-6 md:p-8"
         data-theme="night"
       >
         {step === 1 ? (
@@ -344,7 +348,7 @@ const SignUpPage = () => {
                   </div>
                 </form>
                 <div className="flex items-center justify-center mt-6">
-                  <LocaleSwitcher></LocaleSwitcher>
+                  <LocaleSwitcher />
                 </div>
               </div>
             </div>
@@ -363,11 +367,10 @@ const SignUpPage = () => {
 
                 <div className="text-center space-y-3 mt-6">
                   <h2 className="text-xl font-semibold">
-                    Connect with language partners worldwide
+                    {t("rightSide.title")}
                   </h2>
                   <p className="opacity-70 text-sm">
-                    Practice conversations, make friends, and improve your
-                    language skills together
+                    {t("rightSide.subtitle")}
                   </p>
                 </div>
               </div>

@@ -1,9 +1,11 @@
 import { useMutation, useQueryClient } from "@tanstack/react-query";
-import { CameraIcon, LoaderIcon, MapPinIcon, ShuffleIcon } from "lucide-react";
+import { LoaderIcon, MapPinIcon, ShuffleIcon } from "lucide-react";
 import { useEffect, useState } from "react";
 
+import { useTranslation } from "react-i18next";
 import CostumedSelect from "../components/CostumedSelect.jsx";
-import { LANGUAGES } from "../constants/index.js"; // Assuming you have a languages constant file
+import { showToast } from "../components/CostumedToast.jsx";
+import LocaleSwitcher from "../components/LocaleSwitcher.jsx";
 import { useAuthUser } from "../hooks/useAuthUser";
 import {
   getLearningLanguagesAPI,
@@ -11,9 +13,6 @@ import {
   onboardingAPI,
 } from "../lib/api";
 import { deepTrimObj } from "../lib/utils.js";
-import { showToast } from "../components/CostumedToast.jsx";
-import { useTranslation } from "react-i18next";
-import LocaleSwitcher from "../components/LocaleSwitcher.jsx";
 
 const OnboardingPage = () => {
   const { t } = useTranslation("onboardingPage");
@@ -50,7 +49,8 @@ const OnboardingPage = () => {
     onError: (error) => {
       showToast({
         message:
-          error.response.data.message || "Failed to fetch native languages",
+          error.response.data.message ||
+          t("toast.getNativeLanguagesMutation.error"),
         type: "error",
       });
     },
@@ -64,7 +64,8 @@ const OnboardingPage = () => {
     onError: (error) => {
       showToast({
         message:
-          error.response.data.message || "Failed to fetch learning languages",
+          error.response.data.message ||
+          t("toast.getLearningLanguagesMutation.error"),
         type: "error",
       });
     },
@@ -74,14 +75,15 @@ const OnboardingPage = () => {
     mutationFn: onboardingAPI,
     onSuccess: (data) => {
       showToast({
-        message: data?.message || "Onboarding completed successfully!",
+        message: data?.message || t("toast.onboardingMutation.success"),
         type: "success",
       });
       queryClient.invalidateQueries({ queryKey: ["authUser"] });
     },
     onError: (error) => {
       showToast({
-        message: error.response.data.message || "Failed to complete onboarding",
+        message:
+          error.response.data.message || t("toast.onboardingMutation.error"),
         type: "error",
       });
     },
@@ -94,30 +96,48 @@ const OnboardingPage = () => {
     setFormState({ ...formState, profilePic: randomAvatar });
     if (!isAvatarGeneratedFirstTime) {
       showToast({
-        message: "Random avatar generated successfully!",
+        message: t("toast.handleRandomAvatar.success"),
         type: "success",
       });
     }
     setIsAvatarGeneratedFirstTime(false);
   };
 
-  const handleSubmit = (e) => {
-    e.preventDefault();
+  const validateOnboardingData = () => {
     const trimmedFormState = deepTrimObj(formState);
     trimmedFormState.nativeLanguageId = nativeLanguage.id;
     trimmedFormState.learningLanguageId = learningLanguage.id;
-    try {
-      const onboardingData = {
-        bio: trimmedFormState.bio,
-        location: trimmedFormState.location,
-        nativeLanguageId: trimmedFormState.nativeLanguageId,
-        learningLanguageId: trimmedFormState.learningLanguageId,
+    const onboardingData = {
+      bio: trimmedFormState.bio,
+      location: trimmedFormState.location,
+      nativeLanguageId: trimmedFormState.nativeLanguageId,
+      learningLanguageId: trimmedFormState.learningLanguageId,
+    };
+    if (!nativeLanguage.id || !learningLanguage.id) {
+      return {
+        message: t("toast.validateOnboardingData.error"),
+        cleanedData: onboardingData,
       };
+    }
+    return { message: null, cleanedData: onboardingData };
+  };
+
+  const handleSubmit = (e) => {
+    e.preventDefault();
+    const { message, cleanedData: onboardingData } = validateOnboardingData();
+    if (message) {
+      showToast({
+        message,
+        type: "error",
+      });
+      return;
+    }
+    try {
       onboardingMutation(onboardingData);
     } catch (error) {
       console.error("Onboarding failed:", error);
       showToast({
-        message: error?.message || "Onboarding failed. Please try again.",
+        message: error?.message || t("toast.handleSubmit.error"),
         type: "error",
       });
     }

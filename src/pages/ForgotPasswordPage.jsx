@@ -58,23 +58,34 @@ const ForgotPasswordPage = () => {
     },
   });
 
-  const handleResetPassword = async (e) => {
-    e.preventDefault();
+  const validateResetPasswordData = () => {
     const trimmedEmail = email.trim();
     if (!trimmedEmail) {
-      showToast({
-        message: "Email is required",
+      return {
+        message: t("toast.validateResetPasswordData.allFieldsAreRequired"),
         type: "error",
-      });
-      return;
+      };
     } else if (!/\S+@\S+\.\S+/.test(trimmedEmail)) {
+      return {
+        message: t("toast.validateResetPasswordData.invalidEmail"),
+        type: "error",
+      };
+    }
+    return { message: "" };
+  };
+
+  const handleResetPassword = async (e) => {
+    e.preventDefault();
+    const { message } = validateResetPasswordData();
+    if (message) {
       showToast({
-        message: "Invalid email format",
+        message,
         type: "error",
       });
       return;
     }
     try {
+      const trimmedEmail = email.trim();
       resetPasswordMutation(trimmedEmail);
     } catch (error) {
       console.error(error);
@@ -85,16 +96,16 @@ const ForgotPasswordPage = () => {
     }
   };
 
-  const handleResetPasswordVerification = async (e) => {
-    e.preventDefault();
+  const validateResetPasswordVerificationData = () => {
     const trimmedNewPassword = newPassword.trim();
     const trimmedVerificationCode = verificationCode.trim();
     if (!trimmedNewPassword || !trimmedVerificationCode) {
-      showToast({
-        message: "New password and verification code are required",
+      return {
+        message: t(
+          "toast.validateResetPasswordVerificationData.allFieldsAreRequired"
+        ),
         type: "error",
-      });
-      return;
+      };
     }
     const passwordIsValid =
       trimmedNewPassword.length >= 8 &&
@@ -103,14 +114,30 @@ const ForgotPasswordPage = () => {
       /[0-9]/.test(trimmedNewPassword) &&
       /[!@#$%^&*(),.?":{}|<>]/.test(trimmedNewPassword);
     if (!passwordIsValid) {
+      return {
+        message: t(
+          "toast.validateResetPasswordVerificationData.invalidPassword"
+        ),
+        type: "error",
+      };
+    }
+    return { message: "" };
+  };
+
+  const handleResetPasswordVerification = async (e) => {
+    e.preventDefault();
+    const { message } = validateResetPasswordVerificationData();
+    if (message) {
       showToast({
-        message:
-          "Password must be at least 8 characters long and include uppercase, lowercase, number, and special character",
+        message,
         type: "error",
       });
       return;
     }
+
     try {
+      const trimmedNewPassword = newPassword.trim();
+      const trimmedVerificationCode = verificationCode.trim();
       resetPasswordVerificationMutation({
         newPassword: trimmedNewPassword,
         otp: trimmedVerificationCode,
@@ -118,7 +145,8 @@ const ForgotPasswordPage = () => {
     } catch (error) {
       console.error(error);
       showToast({
-        message: error?.message || "Failed to reset password",
+        message:
+          error?.message || t("toast.handleResetPasswordVerification.error"),
         type: "error",
       });
     }
@@ -127,7 +155,7 @@ const ForgotPasswordPage = () => {
   return (
     <>
       <div
-        className="flex items-center justify-center h-screen p-4 sm:p-6 md:p-8"
+        className="flex items-center justify-center min-h-screen p-4 sm:p-6 md:p-8"
         data-theme="night"
       >
         <div className="border border-primary/25 flex flex-col lg:flex-row w-full max-w-xl mx-auto bg-base-200 rounded-xl shadow-lg">

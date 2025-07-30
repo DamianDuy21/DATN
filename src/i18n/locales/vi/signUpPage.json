@@ -56,5 +56,37 @@
         "loadingText": "Đang xác thực..."
       }
     }
+  },
+
+  "toast": {
+    "signUpMutation": {
+      "success": "Đăng ký thành công! Vui lòng kiểm tra email để xác thực tài khoản.",
+      "error": "Đăng ký không thành công. Vui lòng thử lại."
+    },
+    "signUpVerificationMutation": {
+      "success": "Xác thực thành công! Bạn có thể đăng nhập ngay bây giờ.",
+      "error": "Xác thực không thành công. Vui lòng thử lại."
+    },
+    "resendVerificationCodeMutation": {
+      "success": "Mã xác thực đã được gửi lại. Vui lòng kiểm tra email của bạn.",
+      "error": "Gửi mã xác thực không thành công. Vui lòng thử lại."
+    },
+    "validateSignUpData": {
+      "allFieldsAreRequired": "Tất cả các trường đều bắt buộc.",
+      "invalidFullName": "Họ và tên chỉ chứa chữ cái.",
+      "invalidEmail": "Email không hợp lệ.",
+      "invalidPassword": "Mật khẩu phải chứa ít nhất 8 ký tự, bao gồm chữ hoa, chữ thường, số và ký tự đặc biệt.",
+      "termsAndPolicyNotAgreed": "Bạn phải đồng ý với điều khoản dịch vụ và chính sách bảo mật."
+    },
+    "handleSignup": {
+      "error": "Đăng ký không thành công. Vui lòng thử lại."
+    },
+    "handleResendVerificationCode": {
+      "error": "Gửi mã xác thực không thành công. Vui lòng thử lại."
+    },
+    "handleSignUpVerification": {
+      "emptyVerificationCode": "Vui lòng nhập mã xác thực",
+      "error": "Xác thực không thành công. Vui lòng thử lại."
+    }
   }
 }

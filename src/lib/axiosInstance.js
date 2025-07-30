@@ -1,5 +1,6 @@
 import axios from "axios";
 import Cookies from "js-cookie";
+import i18n from "../i18n";
 
 export const axiosInstance = axios.create({
   baseURL: `http://localhost:8080/api`,
@@ -16,6 +17,9 @@ axiosInstance.interceptors.request.use(
     if (jwt) {
       config.headers["Authorization"] = `Bearer ${jwt}`;
     }
+
+    config.headers["Accept-Language"] = i18n.language || "en";
+
     return config;
   },
   (error) => Promise.reject(error)

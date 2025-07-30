@@ -56,5 +56,36 @@
         "loadingText": "Verifying..."
       }
     }
+  },
+  "toast": {
+    "signUpMutation": {
+      "success": "Sign up successful! Please check your email to verify your account.",
+      "error": "Sign up failed. Please try again."
+    },
+    "signUpVerificationMutation": {
+      "success": "Verification successful! You can log in now.",
+      "error": "Verification failed. Please try again."
+    },
+    "resendVerificationCodeMutation": {
+      "success": "Verification code has been resent. Please check your email.",
+      "error": "Failed to resend verification code. Please try again."
+    },
+    "validateSignUpData": {
+      "allFieldsAreRequired": "All fields are required.",
+      "invalidFullName": "Full name must contain only letters.",
+      "invalidEmail": "Invalid email address.",
+      "invalidPassword": "Password must be at least 8 characters long and include uppercase, lowercase, number, and special character.",
+      "termsAndPolicyNotAgreed": "You must agree to the terms of service and privacy policy."
+    },
+    "handleSignup": {
+      "error": "Sign up failed. Please try again."
+    },
+    "handleResendVerificationCode": {
+      "error": "Failed to resend verification code. Please try again."
+    },
+    "handleSignUpVerification": {
+      "emptyVerificationCode": "Please enter the verification code.",
+      "error": "Verification failed. Please try again."
+    }
   }
 }

@@ -22,13 +22,13 @@ const LoginPage = () => {
     const cleanedLoginData = deepTrimObj(loginData);
     if (!cleanedLoginData.email || !cleanedLoginData.password) {
       showToast({
-        message: "Email and password are required",
+        message: t("toast.handleLogin.allFieldsAreRequired"),
         type: "error",
       });
       return;
     } else if (!isCheckedPolicy) {
       showToast({
-        message: "You must accept the terms and conditions",
+        message: t("toast.handleLogin.termsAndPolicyNotAgreed"),
         type: "error",
       });
       return;
@@ -38,7 +38,7 @@ const LoginPage = () => {
     } catch (error) {
       console.error(error);
       showToast({
-        message: error?.message || "Sign in failed. Please try again.",
+        message: error?.message || t("toast.handleLogin.error"),
         type: "error",
       });
     }
@@ -46,7 +46,7 @@ const LoginPage = () => {
   return (
     <>
       <div
-        className="flex items-center justify-center h-screen p-4 sm:p-6 md:p-8"
+        className="flex items-center justify-center min-h-screen p-4 sm:p-6 md:p-8"
         data-theme="night"
       >
         <div className="border border-primary/25 flex flex-col lg:flex-row w-full max-w-xl lg:max-w-5xl mx-auto bg-base-200 rounded-xl shadow-lg">
@@ -200,7 +200,8 @@ const LoginPage = () => {
           </div>
 
           {/* SIGNUP FORM - RIGHT SIDE */}
-          <div className="hidden lg:flex w-full lg:w-1/2 bg-primary/10 items-center justify-center !min-h-[612px]">
+          {/* !min-h-[684px] */}
+          <div className="hidden lg:flex w-full lg:w-1/2 bg-primary/10 items-center justify-center ">
             <div className="max-w-md p-8">
               {/* Illustration */}
               <div className="relative aspect-square max-w-sm mx-auto">

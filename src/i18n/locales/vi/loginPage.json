@@ -40,5 +40,16 @@
   "rightSide": {
     "title": "Kết nối bạn bè trên toàn thế giới",
     "subtitle": "Trò chuyện, kết bạn và nâng cao kỹ năng ngoại ngữ"
+  },
+  "toast": {
+    "useLogin": {
+      "success": "Đăng nhập thành công!",
+      "error": "Đăng nhập thất bại. Vui lòng thử lại."
+    },
+    "handleLogin": {
+      "allFieldsAreRequired": "Tất cả các trường đều bắt buộc.",
+      "termsAndPolicyNotAgreed": "Bạn phải đồng ý với điều khoản dịch vụ và chính sách bảo mật.",
+      "error": "Đăng nhập không thành công. Vui lòng thử lại."
+    }
   }
 }

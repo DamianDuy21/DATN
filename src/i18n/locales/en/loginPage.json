@@ -40,5 +40,16 @@
   "rightSide": {
     "title": "Connect with friends around the world",
     "subtitle": "Chat, make friends, and improve your language skills together"
+  },
+  "toast": {
+    "useLogin": {
+      "success": "Sign in successful!",
+      "error": "Sign in failed. Please try again."
+    },
+    "handleLogin": {
+      "allFieldsAreRequired": "All fields are required.",
+      "termsAndPolicyNotAgreed": "You must agree to the terms of service and privacy policy.",
+      "error": "Sign in failed. Please try again."
+    }
   }
 }
