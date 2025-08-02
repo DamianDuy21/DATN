@@ -14,6 +14,21 @@ import viForgotPasswordPage from "./locales/vi/forgotPasswordPage.json";
 import enOnboardingPage from "./locales/en/onboardingPage.json";
 import viOnboardingPage from "./locales/vi/onboardingPage.json";
 
+import enProfilePage from "./locales/en/profilePage.json";
+import viProfilePage from "./locales/vi/profilePage.json";
+
+import enChangePasswordPage from "./locales/en/changePasswordPage.json";
+import viChangePasswordPage from "./locales/vi/changePasswordPage.json";
+
+import enSidebar from "./locales/en/sidebar.json";
+import viSidebar from "./locales/vi/sidebar.json";
+
+import enHomePage from "./locales/en/homePage.json";
+import viHomePage from "./locales/vi/homePage.json";
+
+import enFriendsPage from "./locales/en/friendsPage.json";
+import viFriendsPage from "./locales/vi/friendsPage.json";
+
 i18n
   .use(LanguageDetector)
   .use(initReactI18next)
@@ -24,12 +39,22 @@ i18n
         signUpPage: enSignUpPage,
         forgotPasswordPage: enForgotPasswordPage,
         onboardingPage: enOnboardingPage,
+        profilePage: enProfilePage,
+        changePasswordPage: enChangePasswordPage,
+        sidebar: enSidebar,
+        homePage: enHomePage,
+        friendsPage: enFriendsPage,
       },
       vi: {
         loginPage: viLoginPage,
         signUpPage: viSignUpPage,
         forgotPasswordPage: viForgotPasswordPage,
         onboardingPage: viOnboardingPage,
+        profilePage: viProfilePage,
+        changePasswordPage: viChangePasswordPage,
+        sidebar: viSidebar,
+        homePage: viHomePage,
+        friendsPage: viFriendsPage,
       },
     },
     fallbackLng: "en",
@@ -37,7 +62,17 @@ i18n
       order: ["localStorage", "navigator"],
       caches: ["localStorage"],
     },
-    ns: ["loginPage", "signUpPage", "forgotPasswordPage", "onboardingPage"],
+    ns: [
+      "loginPage",
+      "signUpPage",
+      "forgotPasswordPage",
+      "onboardingPage",
+      "profilePage",
+      "changePasswordPage",
+      "sidebar",
+      "homePage",
+      "friendsPage",
+    ],
     defaultNS: "loginPage", // Default namespace
     interpolation: {
       escapeValue: false,

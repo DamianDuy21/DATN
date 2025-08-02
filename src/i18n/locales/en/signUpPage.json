@@ -2,12 +2,13 @@
   "leftSide": {
     "hero": {
       "title": "Create an Account",
-      "subtitle": "Join Chatify and start your language learning adventure!"
+      "subtitle": "Join Chatify and start your language learning journey!"
     },
     "form": {
       "fullName": {
         "label": "Full Name",
-        "placeholder": "Enter your full name"
+        "placeholder": "Enter your full name",
+        "helperText": "You will not able to change your full name later."
       },
       "email": {
         "label": "Email",

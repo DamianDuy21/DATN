@@ -1,10 +1,16 @@
 import daisyui from "daisyui";
+import lineClamp from "@tailwindcss/line-clamp";
 
 /** @type {import('tailwindcss').Config} */
 export default {
   content: ["./index.html", "./src/**/*.{js,ts,jsx,tsx}"],
   theme: {
-    extend: {},
+    extend: {
+      borderRadius: {
+        btn: "var(--rounded-btn, 0.5rem)",
+        card: "var(--rounded-box, 1rem /* 16px */)",
+      },
+    },
   },
   plugins: [daisyui],
   daisyui: {

@@ -1,9 +1,14 @@
+import { useTranslation } from "react-i18next";
+
 const NoFriendsFound = () => {
+  const { t } = useTranslation("homePage");
   return (
     <div className="card bg-base-200 p-6 text-center">
-      <h3 className="font-semibold mb-2">No friends yet</h3>
+      <h3 className="font-semibold mb-2">
+        {t("recentConnections.empty.title")}
+      </h3>
       <p className="text-base-content opacity-70 text-sm">
-        Connect with language partners below to start practicing together!
+        {t("recentConnections.empty.subtitle")}
       </p>
     </div>
   );

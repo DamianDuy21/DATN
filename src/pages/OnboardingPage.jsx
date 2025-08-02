@@ -107,6 +107,7 @@ const OnboardingPage = () => {
     const trimmedFormState = deepTrimObj(formState);
     trimmedFormState.nativeLanguageId = nativeLanguage.id;
     trimmedFormState.learningLanguageId = learningLanguage.id;
+    console.log(nativeLanguage, learningLanguage);
     const onboardingData = {
       bio: trimmedFormState.bio,
       location: trimmedFormState.location,
@@ -154,11 +155,11 @@ const OnboardingPage = () => {
   return (
     <>
       <div
-        className="min-h-screen bg-base-100 flex items-center justify-center p-4 sm:p-6 md:p-8"
+        className="min-h-screen  flex items-center justify-center p-4 sm:p-6 lg:p-8"
         data-theme="night"
       >
-        <div className="card bg-base-200 w-full max-w-3xl shadow-xl">
-          <div className="card-body p-8">
+        <div className="card bg-base-200 w-full max-w-3xl shadow-lg">
+          <div className="card-body p-8 pb-4">
             <h1 className="text-3xl font-bold text-center mb-4">
               {t("hero.title")}
             </h1>
@@ -167,7 +168,7 @@ const OnboardingPage = () => {
               {/* PROFILE PIC CONTAINER */}
               <div className="flex flex-col items-center justify-center space-y-4">
                 {/* IMAGE PREVIEW */}
-                <div className="size-32 rounded-full bg-base-300 overflow-hidden">
+                <div className="size-32 rounded-full bg-base-200 overflow-hidden">
                   {formState.profilePic ? (
                     <img
                       src={formState.profilePic}
@@ -333,8 +334,8 @@ const OnboardingPage = () => {
                 )}
               </button>
             </form>
-            <div className="flex items-center justify-center mt-6">
-              <LocaleSwitcher></LocaleSwitcher>
+            <div className="flex items-center justify-center mt-2">
+              <LocaleSwitcher bordered={true} />
             </div>
           </div>
         </div>

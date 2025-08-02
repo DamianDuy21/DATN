@@ -1,16 +1,18 @@
 import { Link } from "react-router";
 import { LANGUAGE_TO_FLAG } from "../constants";
 import { capitalize } from "../lib/utils";
-import { MessageCircle } from "lucide-react";
+import { Check, MapPinIcon, MessageCircle, Undo2, X } from "lucide-react";
 import { useNavigate } from "react-router";
-import CountAndMessageBadge from "./CountAndMessageBadge";
+import { useEffect, useRef, useState } from "react";
 
-export const FriendCard_v2 = ({ friend }) => {
+export const FriendCard_v2_HomePage_OutgoingRequest = ({ friend }) => {
   const navigate = useNavigate();
+
   const handleRedirectToChatPage = (e) => {
     e.stopPropagation();
     navigate(`/chat/${friend._id}`);
   };
+
   return (
     <div
       key={friend._id}
@@ -24,12 +26,16 @@ export const FriendCard_v2 = ({ friend }) => {
 
           <div>
             <h3 className="font-semibold text-sm">{friend.fullName}</h3>
-            <p className="text-xs text-success flex items-center gap-1">
-              <span className="size-2 rounded-full bg-success inline-block" />
-              Online
-            </p>
+            {friend.location && (
+              <div className="flex items-center text-xs opacity-70 mt-1">
+                <MapPinIcon className="size-3 mr-1" />
+                {friend.location}
+              </div>
+            )}
           </div>
         </div>
+
+        {/* {friend.bio && <p className="text-sm line-clamp-2">{friend.bio}</p>} */}
 
         {/* Languages with flags */}
         <div className="flex flex-wrap gap-2">
@@ -46,25 +52,24 @@ export const FriendCard_v2 = ({ friend }) => {
         {/* <Link to={`/chat/${friend._id}`} className="btn btn-outline w-full">
           Message
         </Link> */}
-        {/* <div className="absolute top-2 right-4 group w-fit h-fit">
-          <div
-            className="btn btn-secondary size-8 p-0 min-w-0 min-h-0 rounded-card cursor-pointer text-sm items-center justify-center hidden group-hover:flex"
-            onClick={(e) => {
-              e.stopPropagation();
-              handleRedirectToChatPage(e);
-            }}
-          >
-            <MessageCircle className="size-4" />
-          </div>
 
-          <div className="btn btn-primary size-8 p-0 min-w-0 min-h-0 rounded-card cursor-pointer flex text-sm items-center justify-center group-hover:hidden">
-            1
-          </div>
+        {/* <div
+          className="btn btn-primary size-8 p-0 min-w-0 min-h-0 rounded-card absolute top-2 right-14 cursor-pointer flex text-sm items-center justify-center "
+          onClick={(e) => {
+            e.stopPropagation();
+          }}
+        >
+          <Check className="size-4" />
         </div> */}
-        {/* <div className="btn btn-primary size-8 p-0 min-w-0 min-h-0 rounded-card absolute top-2 right-4 cursor-pointer flex text-sm items-center justify-center pointer-events-none">
-          1
-        </div> */}
-        <CountAndMessageBadge count={1} className="absolute top-2 right-4" />
+
+        <div
+          className="btn btn-primary size-8 p-0 min-w-0 min-h-0 rounded-card absolute top-2 right-4 cursor-pointer flex text-sm items-center justify-center "
+          onClick={(e) => {
+            e.stopPropagation();
+          }}
+        >
+          <Undo2 className="size-4" />
+        </div>
       </div>
     </div>
   );

@@ -7,7 +7,8 @@
     "form": {
       "fullName": {
         "label": "Họ và tên",
-        "placeholder": "Nhập họ và tên của bạn"
+        "placeholder": "Nhập họ và tên của bạn",
+        "helperText": "Bạn sẽ không thể thay đổi họ và tên của mình."
       },
       "email": {
         "label": "Email",
@@ -38,7 +39,7 @@
   },
   "rightSide": {
     "title": "Kết nối bạn bè trên toàn thế giới",
-    "subtitle": "Trò chuyện, kết bạn và nâng cao kỹ năng ngoại ngữ"
+    "subtitle": "Trò chuyện, kết bạn và nâng cao khả năng ngoại ngữ"
   },
   "verificationStep": {
     "title": "Xác thực tài khoản",

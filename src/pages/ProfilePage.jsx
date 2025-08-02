@@ -1,22 +1,21 @@
+import { useMutation } from "@tanstack/react-query";
 import {
-  CameraIcon,
   LoaderIcon,
   MapPinIcon,
   RotateCcwKey,
   ShuffleIcon,
 } from "lucide-react";
 import { useEffect, useState } from "react";
-import toast from "react-hot-toast";
+import { useTranslation } from "react-i18next";
 import { Link } from "react-router";
-import { LANGUAGES } from "../constants/index.js"; // Assuming you have a languages constant file
-import { useAuthUser } from "../hooks/useAuthUser";
-import { useMutation } from "@tanstack/react-query";
-import { getLearningLanguagesAPI, getNativeLanguagesAPI } from "../lib/api.js";
-import { showToast } from "../components/CostumedToast.jsx";
 import CostumedSelect from "../components/CostumedSelect.jsx";
+import { showToast } from "../components/CostumedToast.jsx";
+import { useAuthUser } from "../hooks/useAuthUser";
+import { getLearningLanguagesAPI, getNativeLanguagesAPI } from "../lib/api.js";
 
 const ProfilePage = () => {
   const { authUser } = useAuthUser();
+  const { t } = useTranslation("profilePage");
 
   const [formState, setFormState] = useState({
     fullName: authUser?.fullName || "",
@@ -90,27 +89,37 @@ const ProfilePage = () => {
 
   return (
     <>
-      <div className="min-h-[calc(100vh-64px)] bg-base-100 flex items-center justify-center p-4 sm:p-6 md:p-8">
-        <div className="card bg-base-200 w-full max-w-3xl shadow-xl">
+      <div className="min-h-[calc(100vh-64px)]  flex items-center justify-center p-4 sm:p-6 lg:p-6">
+        <div className="card bg-base-200 w-full max-w-3xl shadow-lg">
           <div className="card-body p-8">
             <h1 className="text-2xl sm:text-3xl font-bold text-center mb-4">
-              Your Profile
+              {t("hero.title")}
             </h1>
 
             <form action="" onSubmit={handleSubmit} className="space-y-3">
               {/* PROFILE PIC CONTAINER */}
               <div className="flex flex-col items-center justify-center space-y-4">
                 {/* IMAGE PREVIEW */}
-                <div className="size-32 rounded-full bg-base-300 overflow-hidden">
+                <div className="size-32 rounded-full bg-base-200 overflow-hidden">
                   {formState.profilePic ? (
                     <img
-                      src={formState.profilePic}
+                      src={
+                        formState.profilePic ||
+                        "https://avatar.iran.liara.run/public/20.png"
+                      }
                       alt=""
                       className="w-full h-full object-cover"
                     />
                   ) : (
                     <div className="flex items-center justify-center h-full">
-                      {/* <CameraIcon className="size-12 text-base-content opacity-40" /> */}
+                      <img
+                        src={
+                          formState.profilePic ||
+                          "https://avatar.iran.liara.run/public/20.png"
+                        }
+                        alt=""
+                        className="w-full h-full object-cover"
+                      />
                     </div>
                   )}
                 </div>
@@ -120,10 +129,10 @@ const ProfilePage = () => {
                   <button
                     type="button"
                     onClick={handleRandomAvatar}
-                    className="btn btn-accent"
+                    className="btn btn-secondary"
                   >
                     <ShuffleIcon className="size-4" />
-                    Generate Random Avatar
+                    {t("hero.genAvatarButton")}
                   </button>
                 </div>
               </div>
@@ -132,19 +141,21 @@ const ProfilePage = () => {
               <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
                 <div className="form-control">
                   <label className="label">
-                    <span className="label-text">Email</span>
+                    <span className="label-text">{t("form.email.label")}</span>
                   </label>
                   <input
                     type="text"
                     name="email"
                     value={authUser.email}
                     className="input input-bordered w-full pointer-events-none text-sm"
-                    placeholder="Enter your email"
+                    placeholder={t("form.email.placeholder")}
                   />
                 </div>
                 <div className="form-control">
                   <label className="label">
-                    <span className="label-text">Full Name</span>
+                    <span className="label-text">
+                      {t("form.fullName.label")}
+                    </span>
                   </label>
                   <input
                     type="text"
@@ -154,7 +165,7 @@ const ProfilePage = () => {
                       setFormState({ ...formState, fullName: e.target.value })
                     }
                     className="input input-bordered w-full pointer-events-none text-sm"
-                    placeholder="Enter your full name"
+                    placeholder={t("form.fullName.placeholder")}
                   />
                 </div>
               </div>
@@ -162,14 +173,14 @@ const ProfilePage = () => {
               <div className="!mt-6">
                 <Link to="/change-password" className="btn btn-primary">
                   <RotateCcwKey className="size-4" />
-                  Change password
+                  {t("form.changePasswordButton")}
                 </Link>
               </div>
 
               {/* BIO */}
               <div className="form-control">
                 <label className="label">
-                  <span className="label-text">Bio</span>
+                  <span className="label-text">{t("form.bio.label")}</span>
                 </label>
                 <textarea
                   name="bio"
@@ -178,7 +189,7 @@ const ProfilePage = () => {
                     setFormState({ ...formState, bio: e.target.value })
                   }
                   className="textarea textarea-bordered h-24"
-                  placeholder="Tell others about yourself and your language learning goals"
+                  placeholder={t("form.bio.placeholder")}
                 />
               </div>
 
@@ -187,7 +198,9 @@ const ProfilePage = () => {
                 {/* NATIVE LANGUAGE */}
                 <div className="form-control">
                   <label className="label">
-                    <span className="label-text">Native Language</span>
+                    <span className="label-text">
+                      {t("form.nativeLanguage.label")}
+                    </span>
                   </label>
                   {/* <select
                     name="nativeLanguage"
@@ -208,7 +221,7 @@ const ProfilePage = () => {
                     ))}
                   </select> */}
                   <CostumedSelect
-                    placeholder="Select your native language"
+                    placeholder={t("form.nativeLanguage.placeholder")}
                     options={nativeLanguageSelection}
                     onSelect={(option) => setNativeLanguage(option)}
                     defaultValue={nativeLanguage}
@@ -218,7 +231,9 @@ const ProfilePage = () => {
                 {/* LEARNING LANGUAGE */}
                 <div className="form-control">
                   <label className="label">
-                    <span className="label-text">Learning Language</span>
+                    <span className="label-text">
+                      {t("form.learningLanguage.label")}
+                    </span>
                   </label>
                   {/* <select
                     name="learningLanguage"
@@ -242,7 +257,7 @@ const ProfilePage = () => {
                     ))}
                   </select> */}
                   <CostumedSelect
-                    placeholder="Select your learning language"
+                    placeholder={t("form.learningLanguage.placeholder")}
                     options={learningLanguageSelection}
                     onSelect={(option) => setLearningLanguage(option)}
                     defaultValue={learningLanguage}
@@ -253,7 +268,7 @@ const ProfilePage = () => {
               {/* LOCATION */}
               <div className="form-control">
                 <label className="label">
-                  <span className="label-text">Location</span>
+                  <span className="label-text">{t("form.location.label")}</span>
                 </label>
                 <div className="relative">
                   <MapPinIcon className="absolute top-1/2 transform -translate-y-1/2 left-3 size-5 text-base-content opacity-70" />
@@ -265,7 +280,7 @@ const ProfilePage = () => {
                       setFormState({ ...formState, location: e.target.value })
                     }
                     className="input input-bordered w-full pl-10 text-sm"
-                    placeholder="City, Country"
+                    placeholder={t("form.location.placeholder")}
                   />
                 </div>
               </div>
@@ -277,11 +292,11 @@ const ProfilePage = () => {
                 type="submit"
               >
                 {true ? (
-                  <>Update Profile</>
+                  <>{t("form.submitButton.text")}</>
                 ) : (
                   <>
                     <LoaderIcon className="animate-spin size-5" />
-                    Updating...
+                    {t("form.submitButton.loadingText")}
                   </>
                 )}
               </button>

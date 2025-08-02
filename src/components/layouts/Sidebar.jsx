@@ -1,10 +1,20 @@
-import { Hexagon, HomeIcon, UsersIcon } from "lucide-react";
+import {
+  Badge,
+  BellIcon,
+  Hexagon,
+  HomeIcon,
+  MessageCircle,
+  UsersIcon,
+  UsersRound,
+} from "lucide-react";
 import { useEffect, useState } from "react";
 import { Link, useLocation } from "react-router";
 import { useAuthUser } from "../../hooks/useAuthUser";
+import { useTranslation } from "react-i18next";
 
 const Sidebar = () => {
   const { authUser } = useAuthUser();
+  const { t } = useTranslation("sidebar");
   const location = useLocation();
   const currentPath = location.pathname;
 
@@ -30,7 +40,7 @@ const Sidebar = () => {
         <div className="w-full px-4 lg:px-8 h-16 border-b border-base-300 flex items-center justify-center lg:justify-start">
           {!isProfilePage && !isChatPage && !isChangePasswordPage ? (
             windowWidth > 1024 ? (
-              <div className="">
+              <div className="relative -left-[2px]">
                 <Link to="/" className="flex items-center gap-2.5">
                   <Hexagon className="size-6 text-primary" />
                   <span className="text-2xl font-bold font-mono bg-clip-text text-transparent bg-gradient-to-r from-primary to-secondary  tracking-wider">
@@ -48,27 +58,54 @@ const Sidebar = () => {
           ) : null}
         </div>
 
-        <nav className="flex-1 p-4 space-y-2">
+        <nav className="flex-1 p-4 space-y-2 overflow-y-auto">
           <Link
             to="/"
             className={`btn btn-ghost flex justify-center items-center lg:justify-start w-full px-0 lg:gap-4 lg:px-4 normal-case  ${
-              currentPath === "/" ? "btn-active" : ""
+              currentPath === "/" ? "btn-active" : "hover:bg-base-300"
             }`}
           >
-            <HomeIcon className="!size-5 text-base-content opacity-70" />
+            <Badge className="!size-5 text-base-content opacity-70" />
             {!isProfilePage && !isChatPage && !isChangePasswordPage ? (
-              <span className="hidden lg:block">Home</span>
+              <span className="hidden lg:block">{t("pages.home")}</span>
             ) : null}
           </Link>
           <Link
             to="/friends"
             className={`btn btn-ghost flex justify-center items-center lg:justify-start w-full px-0 lg:gap-4 lg:px-4 normal-case ${
-              currentPath === "/friends" ? "btn-active" : ""
+              currentPath === "/friends" ? "btn-active" : "hover:bg-base-300"
             }`}
           >
-            <UsersIcon className="size-5 text-base-content opacity-70" />
+            {/* <UsersRound /> */}
+            <UsersRound className="size-5 text-base-content opacity-70" />
             {!isProfilePage && !isChatPage && !isChangePasswordPage ? (
-              <span className="hidden lg:block">Friends</span>
+              <span className="hidden lg:block">{t("pages.friends")}</span>
+            ) : null}
+          </Link>
+          <Link
+            to="/chats"
+            className={`btn btn-ghost flex justify-center items-center lg:justify-start w-full px-0 lg:gap-4 lg:px-4 normal-case ${
+              currentPath === "/chats" ? "btn-active" : "hover:bg-base-300"
+            }`}
+          >
+            <MessageCircle className="size-5 text-base-content opacity-70" />
+            {!isProfilePage && !isChatPage && !isChangePasswordPage ? (
+              <span className="hidden lg:block">{t("pages.chats")}</span>
+            ) : null}
+          </Link>
+          <Link
+            to="/notifications"
+            className={`btn btn-ghost flex justify-center items-center lg:justify-start w-full px-0 lg:gap-4 lg:px-4 normal-case ${
+              currentPath === "/notifications"
+                ? "btn-active"
+                : "hover:bg-base-300"
+            }`}
+          >
+            <BellIcon className="size-5 text-base-content opacity-70" />
+            {!isProfilePage && !isChatPage && !isChangePasswordPage ? (
+              <span className="hidden lg:block">
+                {t("pages.notifications")}
+              </span>
             ) : null}
           </Link>
         </nav>
@@ -78,7 +115,13 @@ const Sidebar = () => {
           <div className="flex items-center gap-3 relative">
             <div className="avatar">
               <div className="w-10 rounded-full ">
-                <img src={authUser?.profilePic} alt="" />
+                <img
+                  src={
+                    authUser?.profilePic ||
+                    "https://avatar.iran.liara.run/public/20.png"
+                  }
+                  alt=""
+                />
               </div>
             </div>
             <div className="absolute -right-0 -bottom-0 lg:hidden">
@@ -89,7 +132,7 @@ const Sidebar = () => {
                 <p className="font-semibold text-sm">{authUser?.fullName}</p>
                 <p className="text-xs text-success flex items-center gap-1">
                   <span className="size-2 rounded-full bg-success inline-block" />
-                  Online
+                  {t("user.status.online")}
                 </p>
               </div>
             ) : null}

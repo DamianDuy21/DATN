@@ -198,13 +198,13 @@ const SignUpPage = () => {
   return (
     <>
       <div
-        className="flex items-center justify-center min-h-screen p-4 sm:p-6 md:p-8"
+        className="flex items-center justify-center min-h-screen p-4 sm:p-6 lg:p-8"
         data-theme="night"
       >
         {step === 1 ? (
-          <div className="border border-primary/25 flex flex-col lg:flex-row w-full max-w-xl lg:max-w-5xl mx-auto bg-base-200 rounded-xl shadow-lg">
+          <div className="flex flex-col lg:flex-row w-full max-w-xl lg:max-w-5xl mx-auto bg-base-200 rounded-card shadow-lg">
             {/* SIGNUP FORM - LEFT SIDE */}
-            <div className="w-full lg:w-1/2 p-8 flex flex-col">
+            <div className="w-full lg:w-1/2 p-8 pb-4 flex flex-col">
               {/* LOGO */}
               <div className="mb-4 flex items-center justify-start gap-2">
                 <Hexagon className="size-8 text-primary" />
@@ -217,22 +217,28 @@ const SignUpPage = () => {
                 {/* arrow function need to pass event or else not working in onSubmit? */}
                 <form onSubmit={(e) => handleSignup(e)} action="">
                   <div className="space-y-4">
-                    <div>
+                    {/* <div>
                       <h2 className="text-xl font-semibold">
                         {t("leftSide.hero.title")}
                       </h2>
                       <p className="text-sm opacity-70">
                         {t("leftSide.hero.subtitle")}
                       </p>
-                    </div>
+                    </div> */}
                     <div className="space-y-3">
                       {/* FULL NAME */}
                       <div className="form-control w-full">
-                        <label className="label">
-                          <span className="label-text">
-                            {t("leftSide.form.fullName.label")}
-                          </span>
-                        </label>
+                        <div className="flex items-center justify-between">
+                          <label className="label">
+                            <span className="label-text">
+                              {t("leftSide.form.fullName.label")}
+                            </span>
+                          </label>
+                          <p className="text-xs opacity-70 mt-1">
+                            *{t("leftSide.form.fullName.helperText")}
+                          </p>
+                        </div>
+
                         <input
                           type="text"
                           placeholder={t("leftSide.form.fullName.placeholder")}
@@ -347,15 +353,15 @@ const SignUpPage = () => {
                     </div>
                   </div>
                 </form>
-                <div className="flex items-center justify-center mt-6">
-                  <LocaleSwitcher />
+                <div className="flex items-center justify-center mt-4">
+                  <LocaleSwitcher bordered={true} />
                 </div>
               </div>
             </div>
 
             {/* SIGNUP FORM - RIGHT SIDE */}
-            <div className="hidden lg:flex w-full lg:w-1/2 bg-primary/10 items-center justify-center">
-              <div className="max-w-md p-8">
+            <div className="hidden lg:flex w-full lg:w-1/2 bg-primary/10 items-center justify-center rounded-r-card">
+              <div className="max-w-md py-8 px-6">
                 {/* Illustration */}
                 <div className="relative aspect-square max-w-sm mx-auto">
                   <img
@@ -367,17 +373,19 @@ const SignUpPage = () => {
 
                 <div className="text-center space-y-3 mt-6">
                   <h2 className="text-xl font-semibold">
-                    {t("rightSide.title")}
+                    {/* {t("rightSide.title")} */}
+                    {t("leftSide.hero.title")}
                   </h2>
                   <p className="opacity-70 text-sm">
-                    {t("rightSide.subtitle")}
+                    {/* {t("rightSide.subtitle")} */}
+                    {t("leftSide.hero.subtitle")}
                   </p>
                 </div>
               </div>
             </div>
           </div>
         ) : (
-          <div className="border border-primary/25 flex flex-col lg:flex-row w-full max-w-xl mx-auto bg-base-200 rounded-xl shadow-lg">
+          <div className="flex flex-col lg:flex-row w-full max-w-xl mx-auto bg-base-200 rounded-card shadow-lg">
             <div className="w-full p-8 flex flex-col">
               <form onSubmit={(e) => handleSignUpVerification(e)} action="">
                 <div className="space-y-4">
@@ -437,7 +445,7 @@ const SignUpPage = () => {
                 </div>
               </form>
               <div className="flex items-center justify-center mt-6">
-                <LocaleSwitcher></LocaleSwitcher>
+                <LocaleSwitcher bordered={true} />
               </div>
             </div>
           </div>

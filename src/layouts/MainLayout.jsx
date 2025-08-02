@@ -1,7 +1,6 @@
-import React from "react";
-import Sidebar from "../components/layouts/SideBar";
-import Navbar from "../components/layouts/Navbar";
 import { useLocation } from "react-router";
+import Navbar from "../components/layouts/Navbar";
+import Sidebar from "../components/layouts/SideBar";
 const MainLayout = ({ children }) => {
   const location = useLocation();
   const isChatPage = location.pathname?.startsWith("/chat");
@@ -10,7 +9,7 @@ const MainLayout = ({ children }) => {
     location.pathname?.startsWith("/change-password");
   return (
     <>
-      <div className="min-h-screen">
+      <div className="min-h-screen ">
         <div className="flex">
           {/* SIDEBAR */}
           {isChatPage || isProfilePage || isChangePasswordPage ? null : (

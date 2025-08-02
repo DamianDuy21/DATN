@@ -37,7 +37,7 @@ const Navbar = () => {
             {/* LOGO - ONLY IN THE CHAT PAGE */}
             {isProfilePage || isChatPage || isChangePasswordPage ? (
               windowWidth > 1024 ? (
-                <div className="">
+                <div className="relative -left-[2px]">
                   <Link to="/" className="flex items-center gap-2.5">
                     <Hexagon className="size-6 text-primary" />
                     <span className="text-2xl font-bold font-mono bg-clip-text text-transparent bg-gradient-to-r from-primary to-secondary tracking-wider">
@@ -46,7 +46,9 @@ const Navbar = () => {
                   </Link>
                 </div>
               ) : (
-                <div className="">
+                <div
+                  className={`w-12 flex items-center justify-center sm:w-auto`}
+                >
                   <Link to="/" className="flex items-center gap-2.5">
                     <Hexagon className="size-8 text-primary" />
                   </Link>
@@ -55,20 +57,27 @@ const Navbar = () => {
             ) : null}
 
             <div className="flex items-center gap-2 sm:gap-3 ml-auto">
-              <Link to={"/notifications"}>
+              {/* <Link to={"/notifications"}>
                 <button className="btn btn-ghost btn-circle">
                   <BellIcon className="h-5 w-5 text-base-content opacity-70" />
                 </button>
-              </Link>
+              </Link> */}
 
               <ThemeSelector />
 
-              <LocaleSwitcher />
+              <LocaleSwitcher bordered={true} />
 
               <div className="avatar">
                 <Link to={`/profile`}>
-                  <div className="w-10 rounded-full mx-2">
-                    <img src={authUser?.profilePic} alt="" rel="noreferrer" />
+                  <div className="w-8 rounded-full mx-2 overflow-hidden">
+                    <img
+                      src={
+                        authUser?.profilePic ||
+                        "https://avatar.iran.liara.run/public/20.png"
+                      }
+                      alt=""
+                      rel="noreferrer"
+                    />
                   </div>
                 </Link>
               </div>

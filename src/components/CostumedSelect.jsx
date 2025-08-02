@@ -53,14 +53,14 @@ export default function CustomSelect({
 
       {open && (
         <ul
-          className={`absolute z-10 mt-2 w-full costumedSelectOptionContainer max-h-[144px] h-[calc(${options.length} * 48px)] overflow-y-auto`}
+          className={`absolute z-10 mt-2 p-2 flex flex-col gap-1 w-full costumedSelectOptionContainer max-h-[144px] h-[calc(${options.length} * 48px)] overflow-y-auto rounded-card`}
         >
           {options.map((opt, idx) => {
             return (
               <li key={opt.id || idx} className="">
                 <button
                   type="button"
-                  className="block w-full text-left px-4 py-2 hover:bg-base-200 text-sm h-[48px]"
+                  className="block w-full text-left px-4 py-2 hover:bg-base-200 text-sm h-[48px] rounded-btn"
                   onClick={() => handleSelect(opt)}
                 >
                   {opt.name}

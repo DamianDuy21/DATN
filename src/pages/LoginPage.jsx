@@ -46,12 +46,12 @@ const LoginPage = () => {
   return (
     <>
       <div
-        className="flex items-center justify-center min-h-screen p-4 sm:p-6 md:p-8"
+        className="flex items-center justify-center min-h-screen p-4 sm:p-6 lg:p-8"
         data-theme="night"
       >
-        <div className="border border-primary/25 flex flex-col lg:flex-row w-full max-w-xl lg:max-w-5xl mx-auto bg-base-200 rounded-xl shadow-lg">
+        <div className="flex flex-col lg:flex-row w-full max-w-xl lg:max-w-5xl mx-auto bg-base-200 rounded-card shadow-lg">
           {/* SIGNUP FORM - LEFT SIDE */}
-          <div className="w-full lg:w-1/2 p-8 flex flex-col">
+          <div className="w-full lg:w-1/2 p-8 pb-4 flex flex-col">
             {/* LOGO */}
             <div className="mb-4 flex items-center justify-start gap-2">
               <Hexagon className="size-8 text-primary" />
@@ -64,14 +64,14 @@ const LoginPage = () => {
               {/* arrow function need to pass event or else not working in onSubmit? */}
               <form onSubmit={(e) => handleLogin(e)} action="">
                 <div className="space-y-4">
-                  <div>
+                  {/* <div>
                     <h2 className="text-xl font-semibold">
                       {t("leftSide.hero.title")}
                     </h2>
                     <p className="text-sm opacity-70">
                       {t("leftSide.hero.subtitle")}
                     </p>
-                  </div>
+                  </div> */}
                   <div className="space-y-3">
                     {/* EMAIL */}
                     <div className="form-control w-full">
@@ -193,15 +193,15 @@ const LoginPage = () => {
                   </div>
                 </div>
               </form>
-              <div className="flex items-center justify-center mt-6">
-                <LocaleSwitcher></LocaleSwitcher>
+              <div className="flex items-center justify-center mt-4">
+                <LocaleSwitcher bordered={true} />
               </div>
             </div>
           </div>
 
           {/* SIGNUP FORM - RIGHT SIDE */}
           {/* !min-h-[684px] */}
-          <div className="hidden lg:flex w-full lg:w-1/2 bg-primary/10 items-center justify-center ">
+          <div className="hidden lg:flex w-full lg:w-1/2 bg-primary/10 items-center justify-center rounded-r-card">
             <div className="max-w-md p-8">
               {/* Illustration */}
               <div className="relative aspect-square max-w-sm mx-auto">
@@ -214,9 +214,14 @@ const LoginPage = () => {
 
               <div className="text-center space-y-3 mt-6">
                 <h2 className="text-xl font-semibold">
-                  {t("rightSide.title")}
+                  {/* {t("rightSide.title")} */}
+                  {t("leftSide.hero.title")}
                 </h2>
-                <p className="opacity-70 text-sm">{t("rightSide.subtitle")}</p>
+                <p className="opacity-70 text-sm">
+                  {/* {t("rightSide.subtitle")} */}
+
+                  {t("leftSide.hero.subtitle")}
+                </p>
               </div>
             </div>
           </div>

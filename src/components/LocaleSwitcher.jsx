@@ -1,7 +1,7 @@
 import { useEffect, useRef, useState } from "react";
 import { useTranslation } from "react-i18next";
 
-export default function LocaleSwitcher() {
+export default function LocaleSwitcher({ bordered }) {
   const { i18n } = useTranslation();
   const [isOpen, setIsOpen] = useState(false);
   const dropdownRef = useRef(null);
@@ -63,8 +63,6 @@ export default function LocaleSwitcher() {
     return () => document.removeEventListener("mousedown", handleClickOutside);
   }, []);
 
-  console.log(dropUp);
-
   return (
     <div className="dropdown relative" ref={dropdownRef}>
       <div
@@ -84,7 +82,9 @@ export default function LocaleSwitcher() {
         <ul
           ref={ulRef}
           tabIndex={-1}
-          className={`dropdown-content border border-primary/25 bg-base-200 rounded-xl shadow-lg p-2 ${
+          className={`${
+            bordered ? "border border-primary/25" : ""
+          } dropdown-content bg-base-200 rounded-card shadow-lg p-2 ${
             dropUp ? "bottom-14" : "top-14"
           } -right-2`}
         >

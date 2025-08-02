@@ -8,7 +8,6 @@ import ChangePasswordPage from "./pages/ChangePasswordPage.jsx";
 import ChatPage from "./pages/ChatPage";
 import ForgotPasswordPage from "./pages/ForgotPasswordPage.jsx";
 import FriendsPage from "./pages/FriendsPage.jsx";
-import HomePage from "./pages/HomePage";
 
 import NotificationsPage from "./pages/NotificationsPage";
 import OnboardingPage from "./pages/OnboardingPage";
@@ -16,6 +15,8 @@ import ProfilePage from "./pages/ProfilePage.jsx";
 import SignUpPage from "./pages/SignUpPage";
 import { useThemeStore } from "./stores/useThemeStore.js";
 import LoginPage from "./pages/LoginPage.jsx";
+import ChatsPage from "./pages/ChatsPage.jsx";
+import HomePage from "./pages/HomePage.jsx";
 
 const App = () => {
   const { isLoading, authUser } = useAuthUser();
@@ -31,7 +32,7 @@ const App = () => {
 
   return (
     <>
-      <div className="min-h-screen" data-theme={theme}>
+      <div className="min-h-screen " data-theme={theme}>
         <Routes>
           <Route
             path="/"
@@ -46,11 +47,11 @@ const App = () => {
             }
           />
           <Route
-            path="/chat/:id"
+            path="/chats"
             element={
               isAuthenticated && isOnboarding ? (
                 <MainLayout>
-                  <ChatPage />
+                  <ChatsPage />
                 </MainLayout>
               ) : (
                 <Navigate to={!isAuthenticated ? "/signin" : "/onboarding"} />

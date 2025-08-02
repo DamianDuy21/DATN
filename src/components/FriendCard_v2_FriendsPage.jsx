@@ -1,16 +1,19 @@
 import { Link } from "react-router";
 import { LANGUAGE_TO_FLAG } from "../constants";
 import { capitalize } from "../lib/utils";
-import { MessageCircle } from "lucide-react";
+import { MessageCircle, X } from "lucide-react";
 import { useNavigate } from "react-router";
+import { useEffect, useRef, useState } from "react";
 import CountAndMessageBadge from "./CountAndMessageBadge";
 
-export const FriendCard_v2 = ({ friend }) => {
+export const FriendCard_v2_FriendsPage = ({ friend, handleDeleteFriend }) => {
   const navigate = useNavigate();
+
   const handleRedirectToChatPage = (e) => {
     e.stopPropagation();
     navigate(`/chat/${friend._id}`);
   };
+
   return (
     <div
       key={friend._id}
@@ -31,6 +34,8 @@ export const FriendCard_v2 = ({ friend }) => {
           </div>
         </div>
 
+        {friend.bio && <p className="text-sm line-clamp-2">{friend.bio}</p>}
+
         {/* Languages with flags */}
         <div className="flex flex-wrap gap-2">
           <span className="badge badge-secondary h-8 px-4 flex items-center gap-1 relative -top-[1px]">
@@ -46,14 +51,9 @@ export const FriendCard_v2 = ({ friend }) => {
         {/* <Link to={`/chat/${friend._id}`} className="btn btn-outline w-full">
           Message
         </Link> */}
-        {/* <div className="absolute top-2 right-4 group w-fit h-fit">
-          <div
-            className="btn btn-secondary size-8 p-0 min-w-0 min-h-0 rounded-card cursor-pointer text-sm items-center justify-center hidden group-hover:flex"
-            onClick={(e) => {
-              e.stopPropagation();
-              handleRedirectToChatPage(e);
-            }}
-          >
+
+        {/* <div className="absolute top-2 right-14 group w-fit h-fit">
+          <div className="btn btn-secondary size-8 p-0 min-w-0 min-h-0 rounded-card cursor-pointer text-sm items-center justify-center hidden group-hover:flex">
             <MessageCircle className="size-4" />
           </div>
 
@@ -61,10 +61,20 @@ export const FriendCard_v2 = ({ friend }) => {
             1
           </div>
         </div> */}
-        {/* <div className="btn btn-primary size-8 p-0 min-w-0 min-h-0 rounded-card absolute top-2 right-4 cursor-pointer flex text-sm items-center justify-center pointer-events-none">
-          1
-        </div> */}
-        <CountAndMessageBadge count={1} className="absolute top-2 right-4" />
+        <CountAndMessageBadge
+          count={friend.unReadMessages || 0}
+          className={"absolute top-2 right-14"}
+        ></CountAndMessageBadge>
+
+        <div
+          className="btn btn-primary size-8 p-0 min-w-0 min-h-0 rounded-card absolute top-2 right-4 cursor-pointer flex text-sm items-center justify-center "
+          onClick={(e) => {
+            e.stopPropagation();
+            handleDeleteFriend(friend._id);
+          }}
+        >
+          <X className="size-4" />
+        </div>
       </div>
     </div>
   );

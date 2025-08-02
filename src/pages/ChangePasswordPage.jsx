@@ -5,8 +5,10 @@ import { Link, useNavigate } from "react-router";
 
 import { changePasswordAPI, changePasswordVerificationAPI } from "../lib/api";
 import { showToast } from "../components/CostumedToast.jsx";
+import { useTranslation } from "react-i18next";
 
 const ChangePasswordPage = () => {
+  const { t } = useTranslation("changePasswordPage");
   const navigate = useNavigate();
   const [step, setStep] = useState(1);
   const [oldPassword, setOldPassword] = useState("");
@@ -19,8 +21,7 @@ const ChangePasswordPage = () => {
       onSuccess: (data) => {
         showToast({
           message:
-            data?.message ||
-            "Please check your email for the verification code",
+            data?.message || t("step1.toast.changePasswordMutation.success"),
           type: "success",
         });
         setStep(2);
@@ -28,7 +29,8 @@ const ChangePasswordPage = () => {
       onError: (error) => {
         showToast({
           message:
-            error?.response?.data?.message || "Failed to change password",
+            error?.response?.data?.message ||
+            t("step1.toast.changePasswordMutation.error"),
           type: "error",
         });
       },
@@ -41,7 +43,9 @@ const ChangePasswordPage = () => {
     mutationFn: changePasswordVerificationAPI,
     onSuccess: (data) => {
       showToast({
-        message: data?.message || "Password changed successfully",
+        message:
+          data?.message ||
+          t("step2.toast.changePasswordVerificationMutation.success"),
         type: "success",
       });
       navigate("/signin");
@@ -50,7 +54,7 @@ const ChangePasswordPage = () => {
       showToast({
         message:
           error?.response?.data?.message ||
-          "Failed to verify verification code",
+          t("step2.toast.changePasswordVerificationMutation.error"),
         type: "error",
       });
     },
@@ -62,7 +66,7 @@ const ChangePasswordPage = () => {
     const trimmedNewPassword = newPassword.trim();
     if (!trimmedOldPassword || !trimmedNewPassword) {
       showToast({
-        message: "Both fields are required",
+        message: t("step1.toast.validateChangePassword.allFieldsRequired"),
         type: "error",
       });
       return;
@@ -74,7 +78,8 @@ const ChangePasswordPage = () => {
       });
     } catch (error) {
       showToast({
-        message: error?.message || "Failed to change password",
+        message:
+          error?.message || t("step1.toast.changePasswordMutation.error"),
         type: "error",
       });
     }
@@ -84,7 +89,9 @@ const ChangePasswordPage = () => {
     const trimmedVerificationCode = verificationCode.trim();
     if (!trimmedVerificationCode) {
       showToast({
-        message: "Verification code is required",
+        message: t(
+          "step2.toast.validateChangePasswordVerification.allFieldsRequired"
+        ),
         type: "error",
       });
       return;
@@ -93,7 +100,9 @@ const ChangePasswordPage = () => {
       changePasswordVerificationMutation(trimmedVerificationCode);
     } catch (error) {
       showToast({
-        message: error?.message || "Failed to verify verification code",
+        message:
+          error?.message ||
+          t("step2.toast.handleChangePasswordVerification.error"),
         type: "error",
       });
     }
@@ -101,8 +110,8 @@ const ChangePasswordPage = () => {
 
   return (
     <>
-      <div className="flex items-center justify-center min-h-[calc(100vh-64px)] p-4 sm:p-6 md:p-8">
-        <div className="border border-primary/25 flex flex-col lg:flex-row w-full max-w-xl mx-auto bg-base-200 rounded-xl shadow-lg overflow-hidden">
+      <div className="flex items-center justify-center min-h-[calc(100vh-64px)] p-4 sm:p-6 lg:p-6">
+        <div className="flex flex-col lg:flex-row w-full max-w-xl mx-auto bg-base-200 rounded-card shadow-lg overflow-hidden">
           <div className="w-full p-8 flex flex-col">
             {step === 1 ? (
               <form onSubmit={(e) => handleChangePassword(e)} action="">
@@ -112,9 +121,11 @@ const ChangePasswordPage = () => {
                       <ArrowLeft className="text-primary size-6 cursor-pointer" />
                     </Link>
                     <div>
-                      <h2 className="text-xl font-semibold">Change Password</h2>
+                      <h2 className="text-xl font-semibold">
+                        {t("step1.hero.title")}
+                      </h2>
                       <p className="text-sm opacity-70">
-                        Enter your old password and the new password
+                        {t("step1.hero.subtitle")}
                       </p>
                     </div>
                   </div>
@@ -123,29 +134,33 @@ const ChangePasswordPage = () => {
                     {/* OLD PASSWORD */}
                     <div className="form-control w-full">
                       <label className="label">
-                        <span className="label-text">Old Password</span>
+                        <span className="label-text">
+                          {t("step1.form.currentPassword.label")}
+                        </span>
                       </label>
                       <input
                         type="password"
-                        placeholder="Enter your old password"
+                        placeholder={t(
+                          "step1.form.currentPassword.placeholder"
+                        )}
                         className="input input-bordered w-full text-sm"
                         value={oldPassword}
                         onChange={(e) => setOldPassword(e.target.value)}
-                        required
                       />
                     </div>
                     {/* NEW PASSWORD */}
                     <div className="form-control w-full">
                       <label className="label">
-                        <span className="label-text">New Password</span>
+                        <span className="label-text">
+                          {t("step1.form.newPassword.label")}
+                        </span>
                       </label>
                       <input
                         type="password"
-                        placeholder="Enter your new password"
+                        placeholder={t("step1.form.newPassword.placeholder")}
                         className="input input-bordered w-full text-sm"
                         value={newPassword}
                         onChange={(e) => setNewPassword(e.target.value)}
-                        required
                       />
                     </div>
                   </div>
@@ -155,11 +170,11 @@ const ChangePasswordPage = () => {
                     type="submit"
                   >
                     {!isChangingPassword ? (
-                      "Confirm"
+                      t("step1.form.submitButton.text")
                     ) : (
                       <>
                         <LoaderIcon className="animate-spin size-5" />
-                        Loading...
+                        {t("step1.form.submitButton.loadingText")}
                       </>
                     )}
                   </button>
@@ -177,9 +192,11 @@ const ChangePasswordPage = () => {
                       onClick={() => setStep(1)}
                     />
                     <div>
-                      <h2 className="text-xl font-semibold">Change Password</h2>
+                      <h2 className="text-xl font-semibold">
+                        {t("step2.hero.title")}
+                      </h2>
                       <p className="text-sm opacity-70">
-                        Enter verification code
+                        {t("step2.hero.subtitle")}
                       </p>
                     </div>
                   </div>
@@ -187,21 +204,24 @@ const ChangePasswordPage = () => {
                     {/* VERIFICATION CODE */}
                     <div className="form-control w-full">
                       <label className="label">
-                        <span className="label-text">Verification Code</span>
+                        <span className="label-text">
+                          {t("step2.form.verificationCode.label")}
+                        </span>
                       </label>
                       <input
                         type="text"
-                        placeholder="Enter verification code"
+                        placeholder={t(
+                          "step2.form.verificationCode.placeholder"
+                        )}
                         className="input input-bordered w-full text-sm"
                         value={verificationCode}
                         onChange={(e) => setVerificationCode(e.target.value)}
-                        required
                       />
                       <p
                         className="text-sm text-primary hover:underline mt-2 text-end cursor-pointer"
                         onClick={handleChangePassword}
                       >
-                        Resend
+                        {t("step2.form.resend")}
                       </p>
                     </div>
                   </div>
@@ -211,11 +231,11 @@ const ChangePasswordPage = () => {
                     type="submit"
                   >
                     {!isVerifyingCode ? (
-                      "Confirm"
+                      t("step2.form.submitButton.text")
                     ) : (
                       <>
                         <LoaderIcon className="animate-spin size-5" />
-                        Loading...
+                        {t("step2.form.submitButton.loadingText")}
                       </>
                     )}
                   </button>

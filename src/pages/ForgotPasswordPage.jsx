@@ -155,11 +155,11 @@ const ForgotPasswordPage = () => {
   return (
     <>
       <div
-        className="flex items-center justify-center min-h-screen p-4 sm:p-6 md:p-8"
+        className="flex items-center justify-center min-h-screen p-4 sm:p-6 lg:p-8"
         data-theme="night"
       >
-        <div className="border border-primary/25 flex flex-col lg:flex-row w-full max-w-xl mx-auto bg-base-200 rounded-xl shadow-lg">
-          <div className="w-full p-8 flex flex-col">
+        <div className="flex flex-col lg:flex-row w-full max-w-xl mx-auto bg-base-200 rounded-card shadow-lg">
+          <div className="w-full p-8 pb-4 flex flex-col">
             {step === 1 ? (
               <>
                 <form onSubmit={(e) => handleResetPassword(e)} action="">
@@ -219,8 +219,8 @@ const ForgotPasswordPage = () => {
                     </div>
                   </div>
                 </form>
-                <div className="flex items-center justify-center mt-6">
-                  <LocaleSwitcher />
+                <div className="flex items-center justify-center mt-4">
+                  <LocaleSwitcher bordered={true} />
                 </div>
               </>
             ) : (
@@ -306,8 +306,8 @@ const ForgotPasswordPage = () => {
                     </button>
                   </div>
                 </form>
-                <div className="flex items-center justify-center mt-6">
-                  <LocaleSwitcher />
+                <div className="flex items-center justify-center mt-4">
+                  <LocaleSwitcher bordered={true} />
                 </div>
               </>
             )}

@@ -2,7 +2,7 @@
   "leftSide": {
     "hero": {
       "title": "Chào mừng trở lại",
-      "subtitle": "Đăng nhập để tiếp tục hành trình học ngôn ngữ của bạn"
+      "subtitle": "Đăng nhập để tiếp tục hành trình học ngôn ngữ của bạn."
     },
     "form": {
       "email": {
@@ -28,7 +28,7 @@
     "prompt": {
       "noAccount": {
         "text": "Chưa có tài khoản?",
-        "linkText": "Đăng ký ngay"
+        "linkText": "Đăng ký"
       },
       "or": "hoặc",
       "forgotPassword": {
@@ -39,7 +39,7 @@
   },
   "rightSide": {
     "title": "Kết nối bạn bè trên toàn thế giới",
-    "subtitle": "Trò chuyện, kết bạn và nâng cao kỹ năng ngoại ngữ"
+    "subtitle": "Trò chuyện, kết bạn và nâng cao khả năng ngoại ngữ"
   },
   "toast": {
     "useLogin": {
